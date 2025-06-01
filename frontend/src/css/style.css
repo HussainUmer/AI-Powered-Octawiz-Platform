@@ -1,0 +1,420 @@
+/* ========== CSS VARIABLES ========== */
+:root {
+  /* Color Palette */
+  --color-primary: #6b46c1;
+  --color-primary-dark: #553c9a;
+  --color-accent: #00e0d6;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-light: #f5f5f5;
+  --color-gray: #cccccc;
+  --color-text: #1f1f1f;
+  --color-muted: #888888;
+  --color-error: #e53e3e;
+
+  /* Font Families */
+  --font-primary: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-secondary: 'Roboto', sans-serif;
+
+  /* Font Sizes */
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-base: 1rem;
+  --font-lg: 1.25rem;
+  --font-xl: 1.5rem;
+  --font-2xl: 2rem;
+  --font-3xl: 3rem;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+/* ========== RESET STYLES ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: var(--font-primary);
+  background-color: var(--color-white);
+  color: var(--color-text);
+  line-height: 1.5;
+  scroll-behavior: smooth;
+}
+
+/* ========== TYPOGRAPHY ========== */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-black);
+  font-family: var(--font-primary);
+}
+
+h1 { font-size: var(--font-3xl); }
+h2 { font-size: var(--font-2xl); }
+h3 { font-size: var(--font-xl); }
+h4 { font-size: var(--font-lg); }
+h5 { font-size: var(--font-base); }
+h6 { font-size: var(--font-sm); }
+
+p {
+  font-size: var(--font-base);
+  margin-bottom: var(--spacing-md);
+}
+
+/* ========== INPUTS ========== */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-gray);
+  border-radius: 8px;
+  font-size: var(--font-base);
+  transition: border 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+/* ========== BUTTONS ========== */
+button, .btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-base);
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-white);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover, .btn:hover {
+  background: linear-gradient(to right, var(--color-primary-dark), var(--color-primary));
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========== LINKS ========== */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ========== FORMS ========== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ========== UTILITIES ========== */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-md); }
+.mt-3 { margin-top: var(--spacing-lg); }
+
+.mb-1 { margin-bottom: var(--spacing-sm); }
+.mb-2 { margin-bottom: var(--spacing-md); }
+.mb-3 { margin-bottom: var(--spacing-lg); }
+
+
+/* ======================================================= Signin Page Css ======================================================== */
+
+/* SignInPage.css */
+
+.signin-bg {
+  background-color: var(--color-bg);
+  padding: var(--spacing-lg);
+}
+
+.signin-card {
+  max-width: 420px;
+  width: 100%;
+  border-radius: 12px;
+  font-family: var(--font-primary);
+}
+
+/* Optional override to match your branding */
+input.form-control {
+  background-color: var(--color-input-bg, #fff);
+  color: var(--color-text);
+  border: 1px solid var(--color-gray);
+}
+
+input.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: none;
+}
+
+
+
+/*----------------------------------------------- Company Structure-------------------------------------*/
+
+/* Minimal custom styling for Step 2 */
+
+.step2-company-structure {
+  font-family: var(--font-primary);
+}
+
+/* Left sidebar placeholder
+.progress-sidebar {
+  flex: 0 0 320px;
+  background-color: var(--color-bg); /* or any sidebar bg */
+  /* You can add padding/margin or content here later */
+
+/* Right side form container */
+.form-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  background-color: var(--color-bg);
+}
+
+/* Card container same as before */
+.card-container {
+  max-width: 600px;
+  width: 100%;
+  padding: 2rem 2.5rem;
+  background-color: rgba(255 255 255 / 0.05);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  color: var(--color-text);
+}
+
+.title {
+  margin-bottom: 1rem;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.subtitle {
+  margin-bottom: 2rem;
+  color: var(--color-muted);
+  font-size: 1.125rem;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.option-card {
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  background-color: rgba(255 255 255 / 0.05);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  user-select: none;
+  outline-offset: 2px;
+}
+
+.option-card:hover {
+  background-color: rgba(255 255 255 / 0.1);
+}
+
+.option-card.selected {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.option-label {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.option-description {
+  color: rgba(255 255 255 / 0.75);
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.option-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-group .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+
+/* -------------------------------------------step3industry page css ----------------------- */
+.step3-industry {
+  font-family: var(--font-primary);
+}
+
+.progress-sidebar {
+  flex: 0 0 320px;
+  background-color: var(--color-bg);
+  /* reserved space for sidebar */
+}
+
+.form-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  background-color: var(--color-bg);
+}
+
+.card-container {
+  max-width: 600px;
+  width: 100%;
+  padding: 2rem 2.5rem;
+  background-color: rgba(255 255 255 / 0.05);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0 0 0 0.6);
+  color: var(--color-text);
+}
+
+.title {
+  margin-bottom: 1rem;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.subtitle {
+  margin-bottom: 2rem;
+  color: var(--color-muted);
+  font-size: 1.125rem;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+
+
+
+/* --------------------- Step Side Bar---------------------------------------------------- */
+
+.steps-sidebar-wrapper {
+  height: 100vh;            /* full viewport height */
+  max-height: 100vh;        /* max height same as viewport */
+  overflow-y: auto;         /* vertical scroll when needed */
+  background-color: var(--color-bg);
+  padding-top: 3rem;        /* align with main content */
+  margin-left: 3rem;        /* align with main content */
+  box-sizing: border-box;
+  max-width: 600px;         /* consistent with main content */
+}
+
+
+.steps-sidebar-wrapper .container {
+  padding-left: 0;
+  padding-right: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidebar-title {
+  font-weight: 700;
+  color: var(--color-white);
+  margin-bottom: 2rem;
+  font-size: var(--font-lg);
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  cursor: default;
+  user-select: none;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 70px;
+}
+
+.step-number {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-muted);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  color: var(--color-muted);
+  flex-shrink: 0;
+  margin-right: 1rem;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  color: var(--color-muted);
+  font-weight: 400;
+  white-space: nowrap;
+  font-size: var(--font-base);
+  transition: color 0.3s ease;
+}
+
+.step-item.completed .step-number{
+  background-color: var(--color-primary);
+  
+  border-color: var(--color-primary);
+
+}
+
+.step-item.completed .step-number { 
+  color: var(--color-white);
+}
+
+.step-item.completed .step-label { 
+  color: var(--color-white);
+}
+
+.step-item.active .step-number,
+.step-item.active .step-label {
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  font-weight: 700;
+}
+
+
+
+
+
+

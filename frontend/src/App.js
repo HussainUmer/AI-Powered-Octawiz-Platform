@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/style.css';
 
-import SignupPage from './pages/signup';
-import SignInPage from './pages/signin';
+import SignupPage from './pages/userlogin/signup';
+import SignInPage from './pages/userlogin/signin';
 import OnboardingContainer from './pages/maincontainer';
 
 function App() {

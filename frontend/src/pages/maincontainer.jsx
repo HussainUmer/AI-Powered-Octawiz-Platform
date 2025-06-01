@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Step2CompanyStructure from './step2companystructure';
-import Step3Industry from './step3industry';
+import Step3Industry from './offshore/step3industry';
 import NotAvailable from './notavailiable';
-import StepsSidebar from './stepsidebar';
+import StepsSidebar from '../components/stepsidebar';
 
 
 export default function OnboardingContainer() {

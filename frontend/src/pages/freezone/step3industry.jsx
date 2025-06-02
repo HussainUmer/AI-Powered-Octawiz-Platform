@@ -13,7 +13,7 @@ export default function Step3Industry({ onNext, onPrev }) {
 
   return (
     <div className="step3-industry d-flex vh-100 bg-dark text-white">
-      {/* <div className="progress-sidebar"></div> */}
+      <div className="progress-sidebar"></div>
 
       <div className="form-container">
         <div className="card-container">
@@ -23,21 +23,18 @@ export default function Step3Industry({ onNext, onPrev }) {
           </p>
 
           <div className="options-container">
-            {industries.map((industry) => {
-              const isSelected = selectedIndustry === industry;
-              return (
-                <div
-                  key={industry}
-                  role="button"
-                  tabIndex={0}
-                  className={`option-card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => setSelectedIndustry(industry)}
-                  onKeyDown={e => e.key === 'Enter' && setSelectedIndustry(industry)}
-                >
-                  {industry}
-                </div>
-              );
-            })}
+            {industries.map((industry) => (
+              <div
+                key={industry}
+                className={`option-card ${selectedIndustry === industry ? 'selected' : ''}`}
+                onClick={() => setSelectedIndustry(industry)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && setSelectedIndustry(industry)}
+              >
+                {industry}
+              </div>
+            ))}
           </div>
 
           <div className="button-group">

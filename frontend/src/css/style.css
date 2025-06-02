@@ -197,6 +197,7 @@ input.form-control:focus {
 /* Card container same as before */
 .card-container {
   max-width: 600px;
+  max-height: 100vh; 
   width: 100%;
   padding: 2rem 2.5rem;
   background-color: rgba(255 255 255 / 0.05);
@@ -223,6 +224,8 @@ input.form-control:focus {
   flex-direction: column;
   gap: 1rem;
   margin-bottom: 2rem;
+  max-height: 60vh; /* Limit height to allow scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .option-card {
@@ -277,50 +280,11 @@ input.form-control:focus {
   font-family: var(--font-primary);
 }
 
-.progress-sidebar {
-  flex: 0 0 320px;
-  background-color: var(--color-bg);
-  /* reserved space for sidebar */
-}
 
-.form-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem;
-  background-color: var(--color-bg);
+/*  ----------------------------------------- Step4ActivitySelection -------------------------- */
+.step4-activity-selection {
+  font-family: var(--font-primary);
 }
-
-.card-container {
-  max-width: 600px;
-  width: 100%;
-  padding: 2rem 2.5rem;
-  background-color: rgba(255 255 255 / 0.05);
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0 0 0 0.6);
-  color: var(--color-text);
-}
-
-.title {
-  margin-bottom: 1rem;
-  font-weight: 700;
-  font-size: 2rem;
-}
-
-.subtitle {
-  margin-bottom: 2rem;
-  color: var(--color-muted);
-  font-size: 1.125rem;
-}
-
-.options-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
 
 
 

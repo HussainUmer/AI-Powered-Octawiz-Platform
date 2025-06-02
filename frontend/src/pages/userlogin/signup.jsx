@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +13,7 @@ const SignupPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -39,6 +40,7 @@ const SignupPage = () => {
     if (Object.keys(newErrors).length === 0) {
       console.log('Form submitted:', formData);
       // Submit logic here
+      navigate('/onboarding');
     }
   };
 

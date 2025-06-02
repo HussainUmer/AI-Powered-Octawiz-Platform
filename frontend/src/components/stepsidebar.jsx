@@ -1,21 +1,18 @@
 import React from 'react';
 
+// Updated company structure steps to new order after industry selection
 const steps = [
-  { id: 1, label: 'Company Structure' },
-  { id: 2, label: 'Industry' },
-  { id: 3, label: 'Business Activity' },
-  { id: 4, label: 'Visa Requirement' },
-  { id: 5, label: 'Office Preference' },
-  { id: 6, label: 'Ownership' },
-  { id: 7, label: 'Free Zone Recommendation' },
-  { id: 8, label: 'Trade Name' },
-  { id: 9, label: 'Shareholder Details' },
-  { id: 10, label: 'Manager' },
-  { id: 11, label: 'Capital & Shares' },
-  { id: 12, label: 'Upload Documents' },
-  { id: 13, label: 'Review & Payment' },
-  { id: 14, label: 'Confirmation' },
-  { id: 15, label: 'Dashboard' },
+  { id: 1, label: 'Business Name' },
+  { id: 2, label: 'Legal Structure' },
+  { id: 3, label: 'Business Activities' },
+  { id: 4, label: 'Shareholder Details' },
+  { id: 5, label: 'Office Space' },
+  { id: 6, label: 'Document Upload' },
+  { id: 7, label: 'Review & Confirm' },
+  { id: 8, label: 'Payment' },
+  { id: 9, label: 'Processing' },
+  { id: 10, label: 'Bank Account Setup' },
+  { id: 11, label: 'Extras & Compliance' },
 ];
 
 export default function StepsSidebar({ currentStep }) {

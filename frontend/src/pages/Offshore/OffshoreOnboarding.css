@@ -1,0 +1,185 @@
+@import '../../css/style.css';
+
+.offshore-root {
+  --sidebar-width: 300px;
+  --content-max-width: 800px;
+  --card-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* Main Layout */
+.offshore-root .wizard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--color-bg, #1e1e1e);
+  color: var(--color-white);
+  font-family: var(--font-primary);
+}
+
+/* Sidebar Styles */
+.offshore-root .steps-sidebar-wrapper {
+  flex: 0 0 var(--sidebar-width);
+  padding: 3rem 2rem;
+  background-color: var(--color-bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.offshore-root .sidebar-title {
+  font-size: var(--font-xl);
+  margin-bottom: 2.5rem;
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.offshore-root .step-item {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 0.75rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.offshore-root .step-item.active {
+  background-color: rgba(107, 70, 193, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.offshore-root .step-number {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-muted);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  margin-right: 1.5rem;
+}
+
+.offshore-root .step-item.active .step-number,
+.offshore-root .step-item.completed .step-number {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* Main Content */
+.offshore-root .wizard-content {
+  flex: 1;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+}
+
+.offshore-root .form-card {
+  width: 100%;
+  max-width: var(--content-max-width);
+  padding: 3rem;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Form Elements */
+.offshore-root .form-title {
+  font-size: var(--font-2xl);
+  margin-bottom: 1rem;
+  color: var(--color-white);
+}
+
+.offshore-root .form-input {
+  width: 100%;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-white);
+  margin: 0.5rem 0 1.5rem;
+}
+
+.offshore-root .form-btn {
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+/* Option Cards Styling */
+.offshore-root .options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.offshore-root .option-card {
+  padding: 1.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.offshore-root .option-card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.offshore-root .option-card--selected {
+  background-color: rgba(107, 70, 193, 0.3);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
+}
+
+.offshore-root .option-content {
+  padding: 0.5rem;
+  text-align: center;
+}
+
+/* Button Styling */
+.offshore-root .buttons-stack {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2.5rem;
+  gap: 1.5rem;
+}
+
+.offshore-root .back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.offshore-root .continue-btn {
+  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-white);
+}
+
+.offshore-root .form-btn {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.offshore-root .form-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.offshore-root .form-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

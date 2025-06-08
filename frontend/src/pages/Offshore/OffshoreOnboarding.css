@@ -1,12 +1,17 @@
 @import '../../css/style.css';
 
+/* =======================================================
+   Root-level custom properties & scoping
+   ======================================================= */
 .offshore-root {
   --sidebar-width: 300px;
   --content-max-width: 800px;
   --card-bg: rgba(255, 255, 255, 0.05);
 }
 
-/* Main Layout */
+/* =======================================================
+   Layout
+   ======================================================= */
 .offshore-root .wizard-container {
   display: flex;
   min-height: 100vh;
@@ -15,21 +20,20 @@
   font-family: var(--font-primary);
 }
 
-/* Sidebar Styles */
+/* Sidebar */
 .offshore-root .steps-sidebar-wrapper {
   flex: 0 0 var(--sidebar-width);
   padding: 3rem 2rem;
   background-color: var(--color-bg);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
-  height: 100vh;
   overflow-y: auto;
 }
 
 .offshore-root .sidebar-title {
   font-size: var(--font-xl);
   margin-bottom: 2.5rem;
-  color: var(--color-white);
   font-weight: 700;
+  color: var(--color-white);
 }
 
 .offshore-root .step-item {
@@ -38,7 +42,7 @@
   padding: 1.25rem 1.5rem;
   margin-bottom: 0.75rem;
   border-radius: 10px;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .offshore-root .step-item.active {
@@ -52,8 +56,8 @@
   border: 2px solid var(--color-muted);
   border-radius: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   font-weight: 700;
   margin-right: 1.5rem;
 }
@@ -65,53 +69,98 @@
   color: var(--color-white);
 }
 
-/* Main Content */
+/* Main content */
 .offshore-root .wizard-content {
   flex: 1;
   padding: 3rem;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   background-color: var(--color-bg);
 }
 
+/* =======================================================
+   Form Card & Typography
+   ======================================================= */
 .offshore-root .form-card {
   width: 100%;
   max-width: var(--content-max-width);
-  padding: 3rem;
   background-color: var(--card-bg);
   border-radius: 12px;
+  padding: 3rem;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
 }
 
-/* Form Elements */
 .offshore-root .form-title {
   font-size: var(--font-2xl);
   margin-bottom: 1rem;
   color: var(--color-white);
 }
 
+.offshore-root .form-subtitle {
+  margin-bottom: 1.5rem;
+  color: var(--color-muted);
+}
+
+.offshore-root .section-title {
+  margin-bottom: 0.5rem;
+  font-size: var(--font-lg);
+  color: var(--color-white);
+}
+
+/* =======================================================
+   Inputs & Buttons
+   ======================================================= */
 .offshore-root .form-input {
   width: 100%;
   padding: 1rem;
-  background-color: rgba(255, 255, 255, 0.05);
+  margin: 0.5rem 0 1.5rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
   color: var(--color-white);
-  margin: 0.5rem 0 1.5rem;
+}
+
+.offshore-root .form-input:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 .offshore-root .form-btn {
+  flex: 1;
   padding: 1rem 2rem;
-  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
-  color: white;
+  font-weight: 600;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
-  margin-top: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-/* Option Cards Styling */
+
+.offshore-root .form-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.offshore-root .form-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.offshore-root .back-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.offshore-root .continue-btn {
+  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
+  color: var(--color-white);
+}
+
+/* =======================================================
+   Option Cards
+   ======================================================= */
 .offshore-root .options-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -120,12 +169,14 @@
 }
 
 .offshore-root .option-card {
+  position: relative;      /* for tooltip */
+  overflow: visible;       /* allow tooltip to escape */
   padding: 1.5rem 1rem;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .offshore-root .option-card:hover {
@@ -139,47 +190,40 @@
   box-shadow: 0 4px 12px rgba(107, 70, 193, 0.2);
 }
 
-.offshore-root .option-content {
-  padding: 0.5rem;
-  text-align: center;
-}
-
-/* Button Styling */
-.offshore-root .buttons-stack {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2.5rem;
-  gap: 1.5rem;
-}
-
-.offshore-root .back-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
-}
-
-.offshore-root .continue-btn {
-  background: linear-gradient(to right, var(--color-primary), var(--color-primary-dark));
-  color: var(--color-white);
-}
-
-.offshore-root .form-btn {
-  flex: 1;
-  padding: 1rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
+/* =======================================================
+   Learn More & Tooltip
+   ======================================================= */
+.offshore-root .learn-more {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b5b95;
+  text-decoration: underline;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.offshore-root .form-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+.offshore-root .tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 240px;
+  background-color: #333;
+  color: #fff;
+  padding: 0.75rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  z-index: 10;
+  white-space: normal;
 }
 
-.offshore-root .form-btn[disabled] {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.offshore-root .tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 12px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
 }

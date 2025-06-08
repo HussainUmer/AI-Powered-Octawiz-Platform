@@ -1,5 +1,4 @@
-// src/pages/Offshore/Step1BusinessName.jsx
-import React, { useState } from 'react';
+import React from 'react';
 
 const jurisdictions = [
   {
@@ -21,13 +20,11 @@ const jurisdictions = [
     label: 'Ajman Offshore',
     description:
       'Ultra-low setup costs and no minimum capital requirement, with robust privacy for shareholders.',
-    learnMoreUrl: 'https://afz.gov.ae/en.html',
+    learnMoreUrl: 'https://offshore.ajman.ae/',
   },
 ];
 
 export default function Step1BusinessName({ formData, updateField, onNext }) {
-  const [hovered, setHovered] = useState(null);
-
   const isValid =
     formData.jurisdiction.trim() !== '' && formData.companyName.trim() !== '';
 
@@ -49,13 +46,11 @@ export default function Step1BusinessName({ formData, updateField, onNext }) {
                   formData.jurisdiction === jur.id ? 'option-card--selected' : ''
                 }`}
                 onClick={() => updateField('jurisdiction', jur.id)}
-                onMouseEnter={() => setHovered(jur.id)}
-                onMouseLeave={() => setHovered(null)}
               >
                 {/* Label */}
                 <div>{jur.label}</div>
 
-                {/* Learn More (clickable) */}
+                {/* Learn More */}
                 <div
                   className="learn-more"
                   onClick={(e) => {
@@ -66,12 +61,8 @@ export default function Step1BusinessName({ formData, updateField, onNext }) {
                   Learn More
                 </div>
 
-                {/* Hover Tooltip */}
-                {hovered === jur.id && (
-                  <div className="tooltip">
-                    {jur.description}
-                  </div>
-                )}
+                {/* Tooltip always in DOM, shown via CSS */}
+                <div className="tooltip">{jur.description}</div>
               </div>
             ))}
           </div>

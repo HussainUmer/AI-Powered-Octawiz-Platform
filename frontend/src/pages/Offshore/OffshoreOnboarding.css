@@ -138,7 +138,7 @@
 
 .offshore-root .form-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(251, 249, 249, 0.2);
 }
 
 .offshore-root .form-btn[disabled] {
@@ -169,19 +169,21 @@
 }
 
 .offshore-root .option-card {
-  position: relative;      /* for tooltip */
-  overflow: visible;       /* allow tooltip to escape */
+  position: relative;
+  overflow: visible; /* allow tooltip to escape */
   padding: 1.5rem 1rem;
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  z-index: 1; /* Ensure stacking over adjacent cards */
 }
 
 .offshore-root .option-card:hover {
   background-color: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+  z-index: 5; /* Bring hovered card forward */
 }
 
 .offshore-root .option-card--selected {
@@ -202,28 +204,39 @@
   cursor: pointer;
 }
 
+/* Tooltip hidden by default */
 .offshore-root .tooltip {
   position: absolute;
-  top: 100%;
+  top: -100%;
   left: 0;
-  width: 240px;
+  transform: translateY(-0.5rem);
+  width: 260px;
   background-color: #333;
   color: #fff;
-  padding: 0.75rem;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
   font-size: 0.85rem;
-  margin-top: 0.5rem;
   z-index: 10;
   white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+/* Tooltip arrow */
 .offshore-root .tooltip::before {
   content: '';
   position: absolute;
-  top: -6px;
+  bottom: -6px;
   left: 12px;
   border-width: 6px;
   border-style: solid;
-  border-color: transparent transparent #333 transparent;
+  border-color: #333 transparent transparent transparent;
+}
+
+/* Show tooltip on hover */
+.offshore-root .option-card:hover .tooltip {
+  opacity: 1;
+  transform: translateY(-1rem);
 }

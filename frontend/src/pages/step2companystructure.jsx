@@ -1,22 +1,10 @@
+// src/pages/step2companystructure.jsx
+
 import React, { useState } from 'react';
 
-
 const companyStructures = [
-  {
-    id: 'mainland',
-    label: 'Mainland',
-    description: 'Operate anywhere in the UAE with flexible office options.',
-  },
-  {
-    id: 'freezone',
-    label: 'Freezone',
-    description: 'Full ownership, tax benefits & business incentives.',
-  },
-  {
-    id: 'offshore',
-    label: 'Offshore',
-    description: 'Ideal for international business & asset protection.',
-  },
+  { id: 'freezone-standard', label: 'Standard Freezone', description: 'Full ownership, tax benefits & business incentives.' },
+  { id: 'freezone-premium',  label: 'Premium Freezone',  description: 'Enhanced incentives & additional services.' },
 ];
 
 export default function Step2CompanyStructure({ onNext, onPrev }) {
@@ -24,13 +12,11 @@ export default function Step2CompanyStructure({ onNext, onPrev }) {
 
   return (
     <div className="step2-company-structure d-flex vh-100 bg-dark text-white">
-      {/* <div className="progress-sidebar"></div> */}
-
       <div className="form-container">
         <div className="card-container">
           <h2 className="title">Company Structure</h2>
           <p className="subtitle">
-            Choose the entity type that's right for your business.
+            Choose the Freezone entity type that’s right for your business.
           </p>
 
           <div className="options-container">
@@ -50,11 +36,7 @@ export default function Step2CompanyStructure({ onNext, onPrev }) {
           </div>
 
           <div className="button-group">
-            <button
-              className="btn btn-secondary"
-              onClick={onPrev}
-              disabled={!onPrev}
-            >
+            <button className="btn btn-secondary" onClick={onPrev}>
               Back
             </button>
             <button

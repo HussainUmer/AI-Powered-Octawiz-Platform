@@ -158,6 +158,14 @@
   color: var(--color-white);
 }
 
+.offshore-root .buttons-stack {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem; /* Adjust this value as needed */
+  margin-top: 2rem;
+}
+
+
 /* =======================================================
    Option Cards
    ======================================================= */
@@ -240,3 +248,11 @@
   opacity: 1;
   transform: translateY(-1rem);
 }
+
+/*Step2Grid*/
+.offshore-root .options-grid--2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+

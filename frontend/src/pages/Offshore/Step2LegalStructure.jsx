@@ -17,7 +17,7 @@ export default function Step2LegalStructure({ formData, updateField, onNext, onB
 
       <div className="form-group">
         <label className="section-title">Company Structure</label>
-        <div className="options-grid">
+        <div className="options-grid--2x2">
           {structures.map(structure => (
             <div
               key={structure}
@@ -30,12 +30,13 @@ export default function Step2LegalStructure({ formData, updateField, onNext, onB
         </div>
       </div>
 
+
       <div className="buttons-stack">
-        <button className="form-btn" onClick={onBack}>
+        <button className="form-btn back-btn" onClick={onBack}>
           Back
         </button>
         <button 
-          className="form-btn" 
+          className="form-btn continue-btn" 
           onClick={onNext}
           disabled={!isValid}
         >

@@ -23,7 +23,7 @@
 /* Sidebar */
 .offshore-root .steps-sidebar-wrapper {
   flex: 0 0 var(--sidebar-width);
-  padding: 3rem 2rem;
+  padding: 3rem 1rem 3rem 1rem; /* Reduced left/right padding */
   background-color: var(--color-bg);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   overflow-y: auto;
@@ -39,10 +39,11 @@
 .offshore-root .step-item {
   display: flex;
   align-items: center;
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 1rem; /* Reduced padding */
   margin-bottom: 0.75rem;
   border-radius: 10px;
   transition: background-color 0.3s, box-shadow 0.3s;
+  position: relative; /* For tick positioning */
 }
 
 .offshore-root .step-item.active {
@@ -59,7 +60,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  margin-right: 1.5rem;
+  margin-right: 1rem; /* Reduced margin */
 }
 
 .offshore-root .step-item.active .step-number,
@@ -67,6 +68,13 @@
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: var(--color-white);
+}
+
+.offshore-root .step-status {
+  position: absolute;
+  right: 1rem; /* Position tick at the right */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* Main content */

@@ -373,12 +373,124 @@ input.form-control:focus {
 .step-item.active .step-label {
   color: var(--color-white);
   border-color: var(--color-primary);
-  background-color: var(--color-primary);
+  /* background-color: var(--color-primary); */
   font-weight: 700;
 }
 
 
+/* ---------------------------- Step 5 Visa Requirment Screen ---------------------------------------- */
+
+.step5-visa-requirement {
+  font-family: var(--font-primary);
+}
+
+.option-radio {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-group .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* --------------------------------step 6 office Preference ------------------------------------ */
+.step7-office-preference {
+  font-family: var(--font-primary);
+}
 
 
 
+/* ---------------------------------step 7 ownership screen ---------------------------------- */
+
+.step7-ownership {
+  font-family: var(--font-primary);
+}
+
+
+
+/* ---------------------------------- step 8 Recommneded Freezone Screen -----------------------*/
+
+.step8-zone-recommendation {
+  font-family: var(--font-primary);
+}
+
+
+.freezone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.recommended-tag {
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: var(--color-accent);
+  color: var(--color-white);
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  margin-left: 1rem;
+}
+
+.freezone-details {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-group .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Popup Styles */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  color: var(--color-text);
+}
+
+.popup-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.popup-content p {
+  font-size: 1rem;
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+}
+
+.popup-content button {
+  width: 100%;
+}
 

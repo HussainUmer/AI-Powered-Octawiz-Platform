@@ -3,7 +3,7 @@ import React from 'react';
 // Updated company structure steps to new order after industry selection
 const steps = [
   { id: 1, label: 'Business Name' },
-  { id: 2, label: 'Legal Structure' },
+  { id: 2, label: 'Industry Selection' },
   { id: 3, label: 'Business Activities' },
   { id: 4, label: 'Shareholder Details' },
   { id: 5, label: 'Office Space' },

@@ -1,0 +1,45 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Python compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# FastAPI/UVicorn logs
+*.log
+
+# Dependency directories
+/.pip_cache/
+/.cache/
+
+# Testing/coverage
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Other common ignores
+*.bak
+*.tmp
+/dist/
+/build/

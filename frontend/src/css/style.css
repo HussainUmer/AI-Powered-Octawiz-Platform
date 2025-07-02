@@ -494,3 +494,110 @@ input.form-control:focus {
   width: 100%;
 }
 
+
+
+
+/* ========================== ChatBot Component Styles ========================== */
+
+.chatbot-container {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1050;
+}
+
+.chatbot-toggle-btn {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 40px;
+  font-size: 20px;
+  width: 200px;
+  height: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.chatbot-modal {
+  width: 340px;
+  max-height: 500px;
+  background: var(--color-white);
+  color: var(--color-text);
+  border-radius: 12px;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--spacing-md);
+  font-family: var(--font-primary);
+}
+
+.chatbot-header {
+  font-weight: 700;
+  font-size: var(--font-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-black);
+}
+
+.chatbot-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-sm) 0;
+  margin-bottom: var(--spacing-sm);
+  max-height: 300px;
+}
+
+.chatbot-msg {
+  padding: var(--spacing-sm);
+  border-radius: 8px;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-sm);
+  line-height: 1.4;
+}
+
+.chatbot-msg-user {
+  background-color: var(--color-gray-light);
+  align-self: flex-end;
+  text-align: right;
+}
+
+.chatbot-msg-bot {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  align-self: flex-start;
+}
+
+.chatbot-input-row {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.chatbot-input {
+  flex: 1;
+  padding: var(--spacing-sm);
+  font-size: var(--font-base);
+  border-radius: 8px;
+  border: 1px solid var(--color-gray);
+}
+
+/* === Attention Animation for Chatbot Toggle Button === */
+
+@keyframes pulse-chatbot {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(107, 70, 193, 0.4);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(107, 70, 193, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(107, 70, 193, 0);
+  }
+}
+
+.chatbot-toggle-btn {
+  animation: pulse-chatbot 2.5s infinite;
+  transition: transform 0.3s ease;
+}

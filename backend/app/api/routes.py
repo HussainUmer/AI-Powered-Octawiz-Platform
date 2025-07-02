@@ -7,4 +7,5 @@ router = APIRouter()
 
 @router.post("/ask", response_model=QueryResponse)
 async def ask_query(data: QueryRequest):
+    print("Querying RAG with data:", data)
     return {"response": await query_rag(data.query)}

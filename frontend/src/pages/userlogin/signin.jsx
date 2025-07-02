@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const SignInPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
+  const [signinError, setSigninError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -11,15 +14,32 @@ const SignInPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSigninError('');
     const newErrors = {};
     if (!formData.email) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      console.log('Sign-in attempt:', formData);
-      // Add authentication logic here
+      setLoading(true);
+      // Query the users table for the user with the given email
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', formData.email)
+        .single();
+      setLoading(false);
+      if (error || !data) {
+        setSigninError('Invalid email or password.');
+        return;
+      }
+      // Compare password (plain text for now)
+      if (data.password !== formData.password) {
+        setSigninError('Invalid email or password.');
+        return;
+      }
+      // Optionally, store user info in localStorage/sessionStorage here
       navigate('/onboarding');
     }
   };
@@ -31,7 +51,7 @@ const SignInPage = () => {
         <p className="text-center mb-4 text-muted">
           Don’t have an account? <Link to="/signup" className="text-primary text-decoration-none">Create one</Link>
         </p>
-
+        {signinError && <div className="alert alert-danger">{signinError}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
@@ -69,7 +89,9 @@ const SignInPage = () => {
             <a href="/forgot-password" className="text-decoration-none text-primary">Forgot Password?</a>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">Sign In</button>
+          <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
         </form>
       </div>
     </div>

@@ -1,21 +1,19 @@
 import React from 'react';
 
 const steps = [
-  //{ id: 1, label: 'Company Structure' },
   { id: 1, label: 'Industry' },
   { id: 2, label: 'Business Activity' },
-  { id: 3, label: 'Visa Requirement' },
-  { id: 4, label: 'Office Preference' },
-  { id: 5, label: 'Ownership' },
-  { id: 6, label: 'Free Zone Recommendation' },
+  { id: 3, label: 'Ownership Structure' },
+  { id: 4, label: 'Free Zone Recommendation' },
+  { id: 5, label: 'Visa Requirement' },
+  { id: 6, label: 'Office Preference' },
   { id: 7, label: 'Trade Name' },
   { id: 8, label: 'Shareholder Details' },
-  { id: 9, label: 'Manager' },
-  { id: 10, label: 'Capital & Shares' },
-  { id: 11, label: 'Upload Documents' },
-  { id: 12, label: 'Review & Payment' },
-  { id: 13, label: 'Confirmation' },
-  { id: 14, label: 'Dashboard' },
+  { id: 9, label: 'Share Capital & Equity' },
+  { id: 10, label: 'Upload Documents' },
+  { id: 11, label: 'Review' },
+  { id: 12, label: 'Confirmation' },
+  // Add more steps if implemented
 ];
 
 export default function StepsSidebar_freezone({ currentStep }) {

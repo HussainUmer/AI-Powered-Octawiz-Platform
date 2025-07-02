@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ const SignupPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [signupError, setSignupError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,8 +26,9 @@ const SignupPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSignupError('');
     const newErrors = {};
 
     if (!formData.firstName) newErrors.firstName = 'First name is required';
@@ -38,9 +42,26 @@ const SignupPage = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      console.log('Form submitted:', formData);
-      // Submit logic here
-      navigate('/onboarding');
+      setLoading(true);
+      // Insert user into custom users table
+      const { data, error } = await supabase.from('users').insert([
+        {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          password: formData.password, // In production, hash the password before storing
+        },
+      ]);
+      setLoading(false);
+      if (error) {
+        if (error.code === '23505' || error.message.includes('duplicate')) {
+          setSignupError('Email already exists. Please use a different email.');
+        } else {
+          setSignupError(error.message);
+        }
+      } else {
+        navigate('/signin');
+      }
     }
   };
 
@@ -51,7 +72,7 @@ const SignupPage = () => {
         <p>
           Already have an account? <Link to="/signin" className="text-primary">Sign in</Link>
         </p>
-
+        {signupError && <div className="alert alert-danger">{signupError}</div>}
         <form onSubmit={handleSubmit} className="needs-validation" noValidate>
           <div className="mb-1">
             <label className="form-label">First Name</label>
@@ -146,7 +167,7 @@ const SignupPage = () => {
             <div className="invalid-feedback">{errors.agreed}</div>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">Sign up</button>
+          <button type="submit" className="btn btn-primary w-100" disabled={loading}>{loading ? 'Signing up...' : 'Sign up'}</button>
         </form>
       </div>
     </div>

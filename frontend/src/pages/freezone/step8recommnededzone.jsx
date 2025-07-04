@@ -1,21 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
-// Simulated API function (for now)
-const fetchFreezones = () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        recommended: 'Dubai Silicon Oasis (DSO)', // Hardcoded recommended freezone
-        freezones: [
-          { name: 'Dubai Silicon Oasis (DSO)', details: 'Best for tech startups. Full foreign ownership.' },
-          { name: 'Sharjah Publishing City', details: 'Great for publishing and content-related businesses.' },
-          { name: 'Ajman Free Zone', details: 'Low cost, great for small businesses and startups.' },
-          { name: 'Ras Al Khaimah Economic Zone', details: 'Ideal for trading and offshore businesses.' },
-        ]
-      });
-    }, 1000);
-  });
-};
+import { supabase } from '../supabaseClient';
 
 export default function Step8ZoneRecommendation({ onNext, onPrev }) {
   const [freezones, setFreezones] = useState([]);
@@ -23,16 +7,22 @@ export default function Step8ZoneRecommendation({ onNext, onPrev }) {
   const [recommendedFreezone, setRecommendedFreezone] = useState('');
   const [popupVisible, setPopupVisible] = useState(false);
 
-  // Simulate an API call to fetch freezones and recommended freezone
   useEffect(() => {
-    const getFreezones = async () => {
-      const data = await fetchFreezones();
-      setFreezones(data.freezones);
-      setRecommendedFreezone(data.recommended);
-      setSelectedFreezone(data.recommended); // Default to the recommended freezone
+    const fetchFreezones = async () => {
+      const { data, error } = await supabase.from('Freezones').select('*');
+      if (error) {
+        setFreezones([]);
+        setRecommendedFreezone('');
+        return;
+      }
+      setFreezones(data);
+      // Optionally, set a recommended freezone (e.g., first in list)
+      if (data && data.length > 0) {
+        setRecommendedFreezone(data[0].name);
+        setSelectedFreezone(data[0].name);
+      }
     };
-
-    getFreezones();
+    fetchFreezones();
   }, []);
 
   const handleFreezoneSelect = (name) => {
@@ -45,26 +35,22 @@ export default function Step8ZoneRecommendation({ onNext, onPrev }) {
 
   return (
     <div className="step8-zone-recommendation d-flex vh-100 bg-dark text-white">
-
       <div className="form-container">
         <div className="card-container">
           <h2 className="title">Free Zone Recommendation</h2>
           <p className="subtitle">
             Based on your business details, we recommend the following free zone for your company:
           </p>
-
-          {/* Why is this recommended button */}
           <button
             className="btn btn-sm btn-outline-light mb-3"
             onClick={togglePopup}
           >
             Why is this recommended?
           </button>
-
           <div className="freezone-list">
             {freezones.map((freezone) => (
               <div
-                key={freezone.name}
+                key={freezone.id}
                 className={`option-card ${selectedFreezone === freezone.name ? 'selected' : ''}`}
                 onClick={() => handleFreezoneSelect(freezone.name)}
                 role="button"
@@ -79,13 +65,12 @@ export default function Step8ZoneRecommendation({ onNext, onPrev }) {
                 </div>
                 {selectedFreezone === freezone.name && (
                   <div className="freezone-details">
-                    {freezone.details}
+                    {freezone.details || ''}
                   </div>
                 )}
               </div>
             ))}
           </div>
-
           <div className="button-group">
             <button className="btn btn-secondary" onClick={onPrev}>
               Back
@@ -100,16 +85,14 @@ export default function Step8ZoneRecommendation({ onNext, onPrev }) {
           </div>
         </div>
       </div>
-
-      {/* Popup for "Why is this recommended?" */}
       {popupVisible && (
         <div className="popup-overlay">
           <div className="popup-content">
             <h3>Why is this freezone recommended?</h3>
             <p>
-              {recommendedFreezone === 'Dubai Silicon Oasis (DSO)'
-                ? 'Dubai Silicon Oasis is ideal for tech startups due to its full foreign ownership, modern infrastructure, and easy access to the Dubai market.'
-                : 'This freezone is recommended based on your business needs and activities.'}
+              {recommendedFreezone
+                ? `This freezone is recommended based on your business needs and activities.`
+                : ''}
             </p>
             <button onClick={togglePopup} className="btn btn-primary">Close</button>
           </div>

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
 
-export default function Step10Stakeholders({ onNext, onPrev }) {
+export default function Step10Stakeholders({ onNext, onPrev, onboardingId }) {
   const [stakeholders, setStakeholders] = useState([
     { name: '', nationality: '', passport: '', email: '', passportFile: null }
   ]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (idx, field, value) => {
     const updated = [...stakeholders];
@@ -29,12 +32,33 @@ export default function Step10Stakeholders({ onNext, onPrev }) {
   // Remove passportFile from validation for now
   const isValid = stakeholders.every(s => s.name && s.nationality && s.passport && s.email);
 
+  const handleContinue = async () => {
+    setLoading(true);
+    setError('');
+    // Save all stakeholders to Shareholder table
+    const rows = stakeholders.map(s => ({
+      name: s.name,
+      nationality: s.nationality,
+      passport_no: s.passport,
+      emial: s.email,
+      onboarding_id: onboardingId,
+    }));
+    const { error } = await supabase.from('Shareholder').insert(rows);
+    setLoading(false);
+    if (error) {
+      setError('Failed to save stakeholders. Please try again.');
+      return;
+    }
+    onNext({ stakeholders });
+  };
+
   return (
     <div className="step10-stakeholders d-flex vh-100 bg-dark text-white">
       <div className="form-container">
         <div className="card-container" style={{ maxHeight: '90vh', minHeight: '600px', overflowY: 'auto' }}>
           <h2 className="title">Stakeholder Details</h2>
           <p className="subtitle">Enter details for each stakeholder.</p>
+          {error && <div className="alert alert-danger">{error}</div>}
           {stakeholders.map((s, idx) => (
             <div key={idx} className="mb-3 p-2 border rounded bg-secondary bg-opacity-10">
               <div className="mb-2">
@@ -110,10 +134,10 @@ export default function Step10Stakeholders({ onNext, onPrev }) {
             </button>
             <button
               className="btn btn-outline-light fw-semibold"
-              disabled={!isValid}
-              onClick={() => onNext({ stakeholders })}
+              disabled={!isValid || loading}
+              onClick={handleContinue}
             >
-              Continue
+              {loading ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </div>

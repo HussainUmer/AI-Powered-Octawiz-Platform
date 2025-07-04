@@ -23,7 +23,7 @@ const SignInPage = () => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
-      // Query the users table for the user with the given email
+      // Query the Users table (case-sensitive)
       const { data, error } = await supabase
         .from('Users')
         .select('*')
@@ -39,7 +39,14 @@ const SignInPage = () => {
         setSigninError('Invalid email or password.');
         return;
       }
-      // Optionally, store user info in localStorage/sessionStorage here
+      // Store user info in localStorage for session persistence
+      localStorage.setItem('user', JSON.stringify({
+        user_id: data.user_id,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        role: data.role,
+      }));
       navigate('/onboarding');
     }
   };

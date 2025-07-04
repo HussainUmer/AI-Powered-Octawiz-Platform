@@ -8,7 +8,8 @@ export default function Step3Industry({ onNext, onPrev }) {
 
   useEffect(() => {
     const fetchIndustries = async () => {
-      const { data, error } = await supabase.from('industries').select('*');
+      // Use correct table name 'Industry' (case-sensitive)
+      const { data, error } = await supabase.from('Industry').select('*');
       if (error) {
         setIndustries([]);
         setLoading(false);

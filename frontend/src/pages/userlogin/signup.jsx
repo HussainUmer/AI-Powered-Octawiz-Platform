@@ -11,6 +11,7 @@ const SignupPage = () => {
     password: '',
     confirmPassword: '',
     agreed: false,
+    role: 'user', // Default role
   });
 
   const [errors, setErrors] = useState({});
@@ -44,12 +45,13 @@ const SignupPage = () => {
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       // Insert user into custom users table
-      const { data, error } = await supabase.from('users').insert([
+      const { data, error } = await supabase.from('Users').insert([
         {
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
           password: formData.password, // In production, hash the password before storing
+          role: formData.role
         },
       ]);
       setLoading(false);

@@ -25,7 +25,7 @@ const SignInPage = () => {
       setLoading(true);
       // Query the users table for the user with the given email
       const { data, error } = await supabase
-        .from('users')
+        .from('Users')
         .select('*')
         .eq('email', formData.email)
         .single();

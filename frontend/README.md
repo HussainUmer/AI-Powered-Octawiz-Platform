@@ -1,3 +1,36 @@
+# Backend Starting 
+
+- Backend Chatbot is built using FASTAPI. We have used "Gemeni Flash 2.0" Model for llm integration and have integrated RAG pipeline to avoid hillucination.
+
+Following are the commnads to get start with FASTAPI server:
+
+- cd backend
+- pip install -r requirment.txt                        # need to be executed only once in the start if are new  
+- venv/Scripts/activate                                # this line will activate the venv
+- uvicorn app.main:app --reload
+
+The above command will succesfully start the backend chatbot environment to listen and answere on local Machine.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

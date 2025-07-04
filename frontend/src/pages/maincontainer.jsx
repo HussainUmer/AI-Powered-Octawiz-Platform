@@ -145,7 +145,7 @@ export default function OnboardingContainer() {
 
   return (
     <div className="d-flex vh-100 bg-dark text-white">
-      {category === 'freezone' && currentStep !== 14 && <StepsSidebar_freezone currentStep={currentStep} />}
+      {category === 'freezone' && currentStep !== 15 && <StepsSidebar_freezone currentStep={currentStep} />}
       {category === 'mainland' && <StepsSidebar currentStep={currentStep} />}
 
       {/* {category && <StepsSidebar currentStep={currentStep} />} */}

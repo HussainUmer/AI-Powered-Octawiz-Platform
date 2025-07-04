@@ -44,13 +44,14 @@ const SignupPage = () => {
 
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
-      // Insert user into custom users table
-      const { data, error } = await supabase.from('users').insert([
+      // Insert user into new Users table (case-sensitive table/column names)
+      const { data, error } = await supabase.from('Users').insert([
         {
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
-          password: formData.password, // In production, hash the password before storing
+          password: formData.password, // Should be string, not bigint
+          role: 'user',
         },
       ]);
       setLoading(false);

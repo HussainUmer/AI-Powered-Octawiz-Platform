@@ -616,3 +616,9 @@ input.form-control:focus {
   animation: pulse-chatbot 2.5s infinite;
   transition: transform 0.3s ease;
 }
+
+/* Make input placeholder text white for the custom activity input */
+.white-placeholder::placeholder {
+  color: #fff !important;
+  opacity: 1;
+}

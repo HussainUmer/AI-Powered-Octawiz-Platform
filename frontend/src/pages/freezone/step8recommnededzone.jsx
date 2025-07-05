@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Step8ZoneRecommendation({ onNext, onPrev }) {
+export default function Step8ZoneRecommendation({ onNext, onPrev, onboardingId, selectedFreezoneId }) {
   const [freezones, setFreezones] = useState([]);
-  const [selectedFreezone, setSelectedFreezone] = useState('');
+  const [selected, setSelected] = useState(selectedFreezoneId || '');
   const [recommendedFreezone, setRecommendedFreezone] = useState('');
   const [popupVisible, setPopupVisible] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (selectedFreezoneId) setSelected(selectedFreezoneId);
+  }, [selectedFreezoneId]);
 
   useEffect(() => {
     const fetchFreezones = async () => {
@@ -16,21 +22,36 @@ export default function Step8ZoneRecommendation({ onNext, onPrev }) {
         return;
       }
       setFreezones(data);
-      // Optionally, set a recommended freezone (e.g., first in list)
       if (data && data.length > 0) {
         setRecommendedFreezone(data[0].name);
-        setSelectedFreezone(data[0].name);
+        if (!selected) setSelected(data[0].id);
       }
     };
     fetchFreezones();
   }, []);
 
-  const handleFreezoneSelect = (name) => {
-    setSelectedFreezone(name);
+  const handleFreezoneSelect = (id) => {
+    setSelected(id);
   };
 
   const togglePopup = () => {
     setPopupVisible(!popupVisible);
+  };
+
+  const handleContinue = async () => {
+    if (!selected || !onboardingId) return;
+    setSaving(true);
+    setError('');
+    const { error: updateError } = await supabase
+      .from('Onboarding')
+      .update({ freezone: selected })
+      .eq('id', onboardingId);
+    setSaving(false);
+    if (updateError) {
+      setError('Failed to save freezone selection: ' + updateError.message);
+      return;
+    }
+    onNext({ freezone: selected });
   };
 
   return (
@@ -41,63 +62,44 @@ export default function Step8ZoneRecommendation({ onNext, onPrev }) {
           <p className="subtitle">
             Based on your business details, we recommend the following free zone for your company:
           </p>
-          <button
-            className="btn btn-sm btn-outline-light mb-3"
-            onClick={togglePopup}
-          >
-            Why is this recommended?
-          </button>
-          <div className="freezone-list">
-            {freezones.map((freezone) => (
+          <div className="options-container">
+            {freezones.map((fz) => (
               <div
-                key={freezone.id}
-                className={`option-card ${selectedFreezone === freezone.name ? 'selected' : ''}`}
-                onClick={() => handleFreezoneSelect(freezone.name)}
+                key={fz.id}
+                className={`option-card ${selected === fz.id ? 'selected' : ''}`}
+                onClick={() => handleFreezoneSelect(fz.id)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleFreezoneSelect(freezone.name)}
+                onKeyDown={(e) => e.key === 'Enter' && handleFreezoneSelect(fz.id)}
+                style={{ marginBottom: '1rem' }}
               >
-                <div className="option-name">
-                  {freezone.name}
-                  {freezone.name === recommendedFreezone && (
-                    <span className="recommended-tag">Recommended</span>
-                  )}
-                </div>
-                {selectedFreezone === freezone.name && (
-                  <div className="freezone-details">
-                    {freezone.details || ''}
-                  </div>
-                )}
+                <input
+                  type="radio"
+                  checked={selected === fz.id}
+                  onChange={() => handleFreezoneSelect(fz.id)}
+                  id={fz.id}
+                  name="freezone"
+                  className="option-radio"
+                />
+                <label htmlFor={fz.id} className="ms-2">{fz.name}</label>
               </div>
             ))}
           </div>
+          {error && <div className="text-danger mt-2">{error}</div>}
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={onPrev}>
+            <button className="btn btn-secondary" onClick={onPrev} disabled={saving}>
               Back
             </button>
             <button
               className="btn btn-outline-light fw-semibold"
-              disabled={!selectedFreezone}
-              onClick={() => onNext({ selectedFreezone })}
+              disabled={!selected || saving}
+              onClick={handleContinue}
             >
-              Continue
+              {saving ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </div>
       </div>
-      {popupVisible && (
-        <div className="popup-overlay">
-          <div className="popup-content">
-            <h3>Why is this freezone recommended?</h3>
-            <p>
-              {recommendedFreezone
-                ? `This freezone is recommended based on your business needs and activities.`
-                : ''}
-            </p>
-            <button onClick={togglePopup} className="btn btn-primary">Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

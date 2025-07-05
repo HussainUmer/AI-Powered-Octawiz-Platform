@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Step4ActivitySelection({ onNext, onPrev, selectedIndustryId }) {
-  const [selectedActivities, setSelectedActivities] = useState([]);
+export default function Step4ActivitySelection({ onNext, onPrev, selectedIndustryId, onboardingId, selectedActivities: initialSelectedActivities = [], customActivity: initialCustomActivity = '' }) {
+  // Only set from props on mount
+  const [selectedActivities, setSelectedActivities] = useState(initialSelectedActivities);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [customActivity, setCustomActivity] = useState('');
+  const [customActivity, setCustomActivity] = useState(initialCustomActivity);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  // Only set from props on mount
+  useEffect(() => {
+    setSelectedActivities(initialSelectedActivities || []);
+    setCustomActivity(initialCustomActivity || '');
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (!selectedIndustryId) return;
@@ -20,6 +30,19 @@ export default function Step4ActivitySelection({ onNext, onPrev, selectedIndustr
         setActivities([]);
       } else {
         setActivities(data);
+        // Defensive: convert selectedActivities from IDs to names only if needed
+        if (initialSelectedActivities && initialSelectedActivities.length > 0) {
+          const names = data
+            .filter(a => initialSelectedActivities.includes(a.id) || initialSelectedActivities.includes(a.name))
+            .map(a => a.name);
+          // Only update if different
+          if (
+            names.length > 0 &&
+            (names.length !== selectedActivities.length || names.some((n) => !selectedActivities.includes(n)))
+          ) {
+            setSelectedActivities(names);
+          }
+        }
       }
       setLoading(false);
     };
@@ -38,12 +61,29 @@ export default function Step4ActivitySelection({ onNext, onPrev, selectedIndustr
     setCustomActivity(e.target.value);
   };
 
-  const handleContinue = () => {
-    let allActivities = [...selectedActivities];
+  const handleContinue = async () => {
+    setSaving(true);
+    setError('');
+    let updateObj = {};
     if (customActivity.trim()) {
-      allActivities.push(customActivity.trim());
+      updateObj = { custom_activity: customActivity.trim(), activity: null };
+    } else {
+      // Find selected activity IDs from the activities list
+      const selectedIds = activities
+        .filter((a) => selectedActivities.includes(a.name))
+        .map((a) => a.id);
+      updateObj = { activity: selectedIds.length > 0 ? selectedIds[0] : null, custom_activity: null };
     }
-    onNext({ activities: allActivities });
+    const { error: updateError } = await supabase
+      .from('Onboarding')
+      .update(updateObj)
+      .eq('id', onboardingId);
+    setSaving(false);
+    if (updateError) {
+      setError('Failed to save activity selection: ' + updateError.message);
+      return;
+    }
+    onNext({ activities: selectedActivities, customActivity });
   };
 
   return (
@@ -97,16 +137,18 @@ export default function Step4ActivitySelection({ onNext, onPrev, selectedIndustr
             />
           </div>
 
+          {error && <div className="alert alert-danger">{error}</div>}
+
           <div className="button-group">
             <button className="btn btn-secondary" onClick={onPrev}>
               Back
             </button>
             <button
               className="btn btn-outline-light fw-semibold"
-              disabled={selectedActivities.length === 0 && !customActivity.trim()}
+              disabled={(selectedActivities.length === 0 && !customActivity.trim()) || saving}
               onClick={handleContinue}
             >
-              Continue
+              {saving ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </div>

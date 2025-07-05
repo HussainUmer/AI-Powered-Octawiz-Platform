@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from './supabaseClient';
 import CategorySelection from './CategorySelection';
 import MainlandLegalStructure from './mainland/legalStructure';
 import MainlandBusinessActivity from './mainland/businessActivity';
 import MainlandBusinessName from './mainland/businessName';
 import Dashboard from './freezone/dashboard';
 
-//freezone Screens
+// Freezone Screens
 import Step2CompanyStructure from './step2companystructure';
 import Step3Industry from './freezone/step3industry';
 import Step4ActivitySelection from './freezone/step4ActivitySelection';
@@ -30,6 +31,65 @@ export default function OnboardingContainer() {
   const [category, setCategory] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState({});
+  const [onboardingId, setOnboardingId] = useState(null);
+
+  useEffect(() => {
+    // Fetch or create onboarding row for the logged-in user
+    const fetchOrCreateOnboarding = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const user_id = user?.user_id;
+      if (!user_id) return;
+      // Try to fetch existing onboarding row
+      let { data, error } = await supabase
+        .from('Onboarding')
+        .select('*')
+        .eq('user_id', user_id)
+        .single();
+      if (data && data.id) {
+        setOnboardingId(data.id);
+        // Always start from the first step, but prefill previous choices
+        let onboardingData = {};
+        if (data.industry) onboardingData.industryId = data.industry;
+        // --- ACTIVITY PREFILL LOGIC ---
+        if (data.activity || data.custom_activity) {
+          if (data.activity) {
+            // Fetch activity name from Activities table
+            const { data: act, error: actErr } = await supabase
+              .from('Activities')
+              .select('name')
+              .eq('id', data.activity)
+              .single();
+            onboardingData.activities = act && act.name ? [act.name] : [];
+          } else {
+            onboardingData.activities = [];
+          }
+          onboardingData.customActivity = data.custom_activity || '';
+        }
+        if (data.ownership) onboardingData.ownership = data.ownership;
+        if (data.freezone) onboardingData.freezone = data.freezone;
+        if (data.visa_requirement) onboardingData.visa_requirement = data.visa_requirement;
+        if (data.office_type) onboardingData.office_type = data.office_type;
+        if (data.trade_name) onboardingData.trade_name = data.trade_name;
+        // ...add more fields as needed for prefill...
+        setCurrentStep(1); // Always start from first screen
+        setOnboardingData(onboardingData);
+      } else {
+        // Create onboarding row if not found
+        const { data: newData, error: insertError } = await supabase
+          .from('Onboarding')
+          .insert([{ user_id }])
+          .select('id')
+          .single();
+        if (insertError) {
+          console.error('Error creating onboarding row:', insertError);
+          setOnboardingId(null);
+          return;
+        }
+        setOnboardingId(newData?.id);
+      }
+    };
+    fetchOrCreateOnboarding();
+  }, []);
 
   const handleCategorySelect = (cat) => {
     setCategory(cat);
@@ -96,43 +156,57 @@ export default function OnboardingContainer() {
     }
 
     if (category === 'freezone') {
+      // Wait for onboardingId before rendering steps that require it
+      if (!onboardingId && currentStep > 0) {
+        return <div className="p-5 text-white">Loading onboarding...</div>;
+      }
       switch (currentStep) {
         case 0:
-          return <Step2CompanyStructure onNext={nextStep} onPrev={prevStep} />;
+          return <Step2CompanyStructure onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} />;
         case 1:
-          return <Step3Industry onNext={nextStep} onPrev={prevStep} />;
+          return (
+            <Step3Industry
+              onNext={nextStep}
+              onPrev={prevStep}
+              onboardingId={onboardingId}
+              selectedIndustryId={onboardingData.industryId}
+            />
+          );
         case 2:
           return (
             <Step4ActivitySelection
               onNext={nextStep}
               onPrev={prevStep}
               selectedIndustryId={onboardingData.industryId}
+              onboardingId={onboardingId}
+              selectedActivities={onboardingData.activities}
+              customActivity={onboardingData.customActivity}
             />
           );
         case 3:
-          return <Step7Ownership onNext={nextStep} onPrev={prevStep} />;
+          return <Step7Ownership onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} selectedOwnershipId={onboardingData.ownership} />;
         case 4:
-          return <Step8ZoneRecommendation onNext={nextStep} onPrev={prevStep} />;
+          return <Step8ZoneRecommendation onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} selectedFreezoneId={onboardingData.freezone} />;
         case 5:
-          return <Step5VisaRequirement onNext={nextStep} onPrev={prevStep} />;
+          return <Step5VisaRequirement onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} selectedVisaRequirement={onboardingData.visa_requirement} />;
         case 6:
-          return <Step6OfficePreference onNext={nextStep} onPrev={prevStep} />;
+          return <Step6OfficePreference onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} selectedOfficeType={onboardingData.office_type} />;
         case 7:
-          return <Step9TradeName onNext={nextStep} onPrev={prevStep} />;
+          return <Step9TradeName onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} initialTradeName={onboardingData.trade_name} />;
         case 8:
-          return <Step10Stakeholders onNext={nextStep} onPrev={prevStep} />;
+          return <Step10Stakeholders onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} initialStakeholders={onboardingData.stakeholders} />;
         case 9:
-          return <Step11ShareCapital onNext={nextStep} onPrev={prevStep} stakeholders={onboardingData.stakeholders || []} />;
+          return <Step11ShareCapital onNext={nextStep} onPrev={prevStep} stakeholders={onboardingData.stakeholders || []} onboardingId={onboardingId} initialEquity={onboardingData.equity} initialShareCapital={onboardingData.shareCapital} />;
         case 10:
-          return <Step12UploadDocuments onNext={nextStep} onPrev={prevStep} />;
+          return <Step12UploadDocuments onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} />;
         case 11:
-          return <Step13ReviewPayment onboardingData={onboardingData} onPrev={prevStep} onPayment={() => setCurrentStep(12)} />;
+          return <Step13ReviewPayment onboardingData={onboardingData} onPrev={prevStep} onPayment={() => setCurrentStep(12)} onboardingId={onboardingId} />;
         case 12:
-          return <Step14Payment onboardingData={onboardingData} onPrev={() => setCurrentStep(11)} onPayment={() => setCurrentStep(13)} />;
+          return <Step14Payment onboardingData={onboardingData} onPrev={() => setCurrentStep(11)} onPayment={() => setCurrentStep(13)} onboardingId={onboardingId} />;
         case 13:
-          return <Step14Confirmation onDashboard={() => setCurrentStep(14)} />;
+          return <Step14Confirmation onDashboard={() => setCurrentStep(14)} onboardingId={onboardingId} />;
         case 14:
-          return <Dashboard />;
+          return <Dashboard onboardingId={onboardingId} />;
         case 99:
           return <NotAvailable onBack={() => setCurrentStep(1)} />;
         default:
@@ -147,154 +221,11 @@ export default function OnboardingContainer() {
     <div className="d-flex vh-100 bg-dark text-white">
       {category === 'freezone' && currentStep !== 15 && <StepsSidebar_freezone currentStep={currentStep} />}
       {category === 'mainland' && <StepsSidebar currentStep={currentStep} />}
-
-      {/* {category && <StepsSidebar currentStep={currentStep} />} */}
       <main className="flex-grow-1 overflow-auto p-5">{renderStep()}</main>
       <ChatBot />
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // src/pages/maincontainer.jsx
-// import React, { useState } from 'react';
-// import CategorySelection from './CategorySelection';
-// import MainlandBusinessName from './mainland/businessName';
-// import MainlandLegalStructure from './mainland/legalStructure';
-// import MainlandBusinessActivity from './mainland/businessActivity';
-// <<<<<<< Updated upstream
-// import Step2CompanyStructure from './step2companystructure';
-// import Step3Industry from './freezone/step3industry';
-// import Step4ActivitySelection from './freezone/step4ActivitySelection';
-// =======
-// import MainlandBusinessName from './mainland/businessName';
-
-
-// //freezone Screens
-// import Step2CompanyStructure from './step2companystructure';
-// import Step3Industry from './freezone/step3industry';
-// import Step4ActivitySelection from './freezone/step4ActivitySelection';
-// import Step5VisaRequirement from './freezone/step5visarequirment';
-// import Step6OfficePreference from './freezone/step6officepref';
-// import Step7Ownership from './freezone/step7ownership';
-// import Step8ZoneRecommendation from './freezone/step8recommnededzone';
-// import Step9TradeName from './freezone/step9tradename';
-// import Step10Stakeholders from './freezone/step10stakeholders';
-// import Step11ShareCapital from './freezone/step11sharecapital';
-// import Step12UploadDocuments from './freezone/step12uploaddocuments';
-// import Step13ReviewPayment from './freezone/step13reviewpayment';
-// import Step14Confirmation from './freezone/step14confirmation';
-
-// >>>>>>> Stashed changes
-// import NotAvailable from './notavailiable';
-// import StepsSidebar from '../components/stepsidebar';
-// import StepsSidebar_freezone from '../components/stepsidebar_freezone';
-
-// export default function OnboardingContainer() {
-//   const [category, setCategory] = useState(null);
-//   const [currentStep, setCurrentStep] = useState(1);
-//   const [onboardingData, setOnboardingData] = useState({});
-
-//   const handleCategorySelect = (cat) => {
-//     setCategory(cat);
-//     setCurrentStep(1);
-//     setOnboardingData({ category: cat });
-//   };
-
-//   const nextStep = (data = {}) => {
-//     setOnboardingData(prev => ({ ...prev, ...data }));
-//     setCurrentStep(prev => prev + 1);
-//   };
-
-//   const prevStep = () => {
-//     setCurrentStep(prev => Math.max(prev - 1, 1));
-//   };
-
-//   const renderStep = () => {
-//     // 1) No category yet → show the three-way chooser
-//     if (!category) {
-//       return <CategorySelection onSelect={handleCategorySelect} />;
-//     }
-
-//     // 2) Mainland flow
-//     if (category === 'mainland') {
-//       switch (currentStep) {
-//         case 1:
-//           return (
-//             <MainlandBusinessName
-//               onNext={(data) => {
-//                 if (data.backToCategory) {
-//                   setCategory(null);
-//                 } else {
-//                   nextStep(data);
-//                 }
-//               }}
-//             />
-//           );
-//         case 2:
-//           return <MainlandLegalStructure onNext={nextStep} onPrev={() => setCurrentStep(1)} />;
-//         case 3:
-//           return <MainlandBusinessActivity onNext={nextStep} onPrev={() => setCurrentStep(2)} />;
-//         default:
-//           return <div className="p-5 text-white">Mainland step not implemented yet.</div>;
-//       }
-//     }
-
-//     // 3) Freezone flow
-//     if (category === 'freezone') {
-//       switch (currentStep) {
-//         case 1:
-//           return <Step2CompanyStructure onNext={nextStep} onPrev={prevStep} />;
-//         case 2:
-//           return <Step3Industry onNext={nextStep} onPrev={prevStep} />;
-//         case 3:
-//           return (
-//             <Step4ActivitySelection
-//               onNext={nextStep}
-//               onPrev={prevStep}
-//               selectedIndustryId={onboardingData.industryId}
-//             />
-//           );
-//         default:
-//           return <NotAvailable onBack={() => setCurrentStep(1)} />;
-//       }
-//     }
-
-//     return null;
-//   };
-
-//   return (
-//     <div className="d-flex vh-100 bg-dark text-white">
-//       {/* show sidebar only for Mainland & Freezone */}
-//       {category && <StepsSidebar currentStep={currentStep} />}
-//       <main className="flex-grow-1 overflow-auto p-5">
-//         {renderStep()}
-//       </main>
-//     </div>
-//   );
-// }
 
 
 

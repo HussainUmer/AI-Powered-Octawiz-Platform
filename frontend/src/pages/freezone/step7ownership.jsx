@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Step7Ownership({ onNext, onPrev }) {
+export default function Step7Ownership({ onNext, onPrev, onboardingId, selectedOwnershipId }) {
   const [ownershipOptions, setOwnershipOptions] = useState([]);
   const [selectedOwnership, setSelectedOwnership] = useState('');
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (selectedOwnershipId) setSelectedOwnership(selectedOwnershipId);
+  }, [selectedOwnershipId]);
 
   useEffect(() => {
     const fetchOwnershipStructures = async () => {
@@ -21,6 +27,22 @@ export default function Step7Ownership({ onNext, onPrev }) {
 
   const handleOwnershipSelection = (ownershipId) => {
     setSelectedOwnership(ownershipId);
+  };
+
+  const handleContinue = async () => {
+    if (!selectedOwnership || !onboardingId) return;
+    setSaving(true);
+    setError('');
+    const { error: updateError } = await supabase
+      .from('Onboarding')
+      .update({ ownership: selectedOwnership })
+      .eq('id', onboardingId);
+    setSaving(false);
+    if (updateError) {
+      setError('Failed to save ownership selection: ' + updateError.message);
+      return;
+    }
+    onNext({ ownership: selectedOwnership });
   };
 
   return (
@@ -60,16 +82,17 @@ export default function Step7Ownership({ onNext, onPrev }) {
               ))
             )}
           </div>
+          {error && <div className="text-danger mt-2">{error}</div>}
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={onPrev}>
+            <button className="btn btn-secondary" onClick={onPrev} disabled={saving}>
               Back
             </button>
             <button
               className="btn btn-outline-light fw-semibold"
-              disabled={!selectedOwnership}
-              onClick={() => onNext({ ownership: selectedOwnership })}
+              disabled={!selectedOwnership || saving}
+              onClick={handleContinue}
             >
-              Continue
+              {saving ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </div>

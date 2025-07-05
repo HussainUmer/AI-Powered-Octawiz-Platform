@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 
 const officePreferences = [
   { id: 'no-office', label: 'No office needed' },
@@ -6,11 +7,33 @@ const officePreferences = [
   { id: 'private-office', label: 'Private Office' },
 ];
 
-export default function Step6OfficePreference({ onNext, onPrev }) {
-  const [selectedOffice, setSelectedOffice] = useState('');
+export default function Step6OfficePreference({ onNext, onPrev, onboardingId, selectedOfficeType }) {
+  const [selectedOffice, setSelectedOffice] = useState(selectedOfficeType || '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (selectedOfficeType) setSelectedOffice(selectedOfficeType);
+  }, [selectedOfficeType]);
 
   const handleOfficeSelection = (office) => {
     setSelectedOffice(office);
+  };
+
+  const handleContinue = async () => {
+    if (!selectedOffice || !onboardingId) return;
+    setSaving(true);
+    setError('');
+    const { error: updateError } = await supabase
+      .from('Onboarding')
+      .update({ office_type: selectedOffice })
+      .eq('id', onboardingId);
+    setSaving(false);
+    if (updateError) {
+      setError('Failed to save office preference: ' + updateError.message);
+      return;
+    }
+    onNext({ office_type: selectedOffice });
   };
 
   return (
@@ -46,17 +69,17 @@ export default function Step6OfficePreference({ onNext, onPrev }) {
               </div>
             ))}
           </div>
-
+          {error && <div className="text-danger mt-2">{error}</div>}
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={onPrev}>
+            <button className="btn btn-secondary" onClick={onPrev} disabled={saving}>
               Back
             </button>
             <button
               className="btn btn-outline-light fw-semibold"
-              disabled={!selectedOffice}
-              onClick={() => onNext({ officePreference: selectedOffice })}
+              disabled={!selectedOffice || saving}
+              onClick={handleContinue}
             >
-              Continue
+              {saving ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </div>

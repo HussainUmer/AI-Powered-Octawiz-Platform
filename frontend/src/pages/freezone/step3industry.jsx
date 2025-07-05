@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Step3Industry({ onNext, onPrev }) {
+export default function Step3Industry({ onNext, onPrev, onboardingId, selectedIndustryId }) {
   const [industries, setIndustries] = useState([]);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchIndustries = async () => {
@@ -17,9 +19,31 @@ export default function Step3Industry({ onNext, onPrev }) {
       }
       setIndustries(data);
       setLoading(false);
+      // If user has a previous choice, set it as selected
+      if (selectedIndustryId) {
+        const found = data.find((ind) => ind.id === selectedIndustryId);
+        if (found) setSelectedIndustry(found);
+      }
     };
     fetchIndustries();
-  }, []);
+  }, [selectedIndustryId]);
+
+  const handleContinue = async () => {
+    if (!selectedIndustry || !onboardingId) return;
+    setSaving(true);
+    setError('');
+    // Save industry selection to Onboarding table (store industry id)
+    const { error: updateError } = await supabase
+      .from('Onboarding')
+      .update({ industry: selectedIndustry.id })
+      .eq('id', onboardingId);
+    setSaving(false);
+    if (updateError) {
+      setError('Failed to save industry selection: ' + updateError.message);
+      return;
+    }
+    onNext({ industryId: selectedIndustry.id });
+  };
 
   return (
     <div className="step3-industry d-flex vh-100 bg-dark text-white">
@@ -36,30 +60,33 @@ export default function Step3Industry({ onNext, onPrev }) {
             ) : industries.length === 0 ? (
               <div>No industries found.</div>
             ) : (
-              industries.map((industry) => (
-                <div
-                  key={industry.id}
-                  className={`option-card ${selectedIndustry && selectedIndustry.id === industry.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedIndustry(industry)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && setSelectedIndustry(industry)}
-                >
-                  {industry.name}
-                </div>
-              ))
+              industries.map((industry) => {
+                return (
+                  <div
+                    key={industry.id}
+                    className={`option-card ${selectedIndustry && selectedIndustry.id === industry.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedIndustry(industry)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setSelectedIndustry(industry)}
+                  >
+                    {industry.name}
+                  </div>
+                );
+              })
             )}
           </div>
+          {error && <div className="text-danger mt-2">{error}</div>}
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={onPrev}>
+            <button className="btn btn-secondary" onClick={onPrev} disabled={saving}>
               Back
             </button>
             <button
               className="btn btn-outline-light fw-semibold"
-              disabled={!selectedIndustry}
-              onClick={() => onNext({ industryId: selectedIndustry?.id, industryName: selectedIndustry?.name })}
+              disabled={!selectedIndustry || saving}
+              onClick={handleContinue}
             >
-              Continue
+              {saving ? 'Saving...' : 'Continue'}
             </button>
           </div>
         </div>

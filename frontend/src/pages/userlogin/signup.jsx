@@ -10,7 +10,6 @@ const SignupPage = () => {
     confirmEmail: '',
     password: '',
     confirmPassword: '',
-    agreed: false,
     role: 'user', // Default role
   });
 
@@ -38,7 +37,6 @@ const SignupPage = () => {
     if (formData.email !== formData.confirmEmail) newErrors.confirmEmail = 'Emails do not match';
     if (!formData.password) newErrors.password = 'Password is required';
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
-    if (!formData.agreed) newErrors.agreed = 'You must agree to the terms';
 
     setErrors(newErrors);
 
@@ -161,21 +159,6 @@ const SignupPage = () => {
               placeholder="Confirm password"
             />
             <div className="invalid-feedback">{errors.confirmPassword}</div>
-          </div>
-
-          <div className="mb-1 form-check">
-            <input
-              type="checkbox"
-              className={`form-check-input ${errors.agreed ? 'is-invalid' : ''}`}
-              name="agreed"
-              checked={formData.agreed}
-              onChange={handleChange}
-              id="termsCheck"
-            />
-            <label className="form-check-label" htmlFor="termsCheck">
-              I read and agree with the <a href="/terms">Terms of Use</a> and <a href="/privacy">Privacy Policy</a>
-            </label>
-            <div className="invalid-feedback">{errors.agreed}</div>
           </div>
 
           <button type="submit" className="btn btn-primary w-100" disabled={loading}>{loading ? 'Signing up...' : 'Sign up'}</button>

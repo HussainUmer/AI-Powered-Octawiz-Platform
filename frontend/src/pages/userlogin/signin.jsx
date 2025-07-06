@@ -88,14 +88,6 @@ const SignInPage = () => {
             {errors.password && <div className="invalid-feedback">{errors.password}</div>}
           </div>
 
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div className="form-check">
-              <input type="checkbox" className="form-check-input" id="rememberMe" />
-              <label htmlFor="rememberMe" className="form-check-label">Remember me</label>
-            </div>
-            <a href="/forgot-password" className="text-decoration-none text-primary">Forgot Password?</a>
-          </div>
-
           <button type="submit" className="btn btn-primary w-100" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

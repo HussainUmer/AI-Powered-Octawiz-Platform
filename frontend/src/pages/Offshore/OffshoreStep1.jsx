@@ -2,9 +2,9 @@
 import React from 'react';
 
 const OffshoreStep1 = ({ formData, setFormData, onNext, onBack }) => (
-  <div className="step1-contact d-flex vh-100 bg-dark text-white">
-    <div className="form-container">
-      <div className="card-container">
+  <div className="step1-contact bg-dark text-white d-flex flex-column" style={{ height: '100vh' }}>
+    <div className="form-container flex-grow-1 d-flex justify-content-center align-items-center overflow-auto">
+      <div className="card-container w-100" style={{ maxWidth: '500px' }}>
         <h2 className="title">Contact Information</h2>
         <p className="subtitle">Please provide your contact details</p>
 
@@ -30,19 +30,14 @@ const OffshoreStep1 = ({ formData, setFormData, onNext, onBack }) => (
           onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
         />
 
-        <div className="button-group">
-          <button
-            className="btn btn-secondary"
-            onClick={onBack}
-          >
+        <div className="button-group d-flex justify-content-between">
+          <button className="btn btn-secondary" onClick={onBack}>
             Back
           </button>
           <button
             className="btn btn-outline-light fw-semibold"
             disabled={
-              !formData.contactName ||
-              !formData.contactPhone ||
-              !formData.contactEmail
+              !formData.contactName || !formData.contactPhone || !formData.contactEmail
             }
             onClick={onNext}
           >

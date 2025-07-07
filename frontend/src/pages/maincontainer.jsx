@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import CategorySelection from './CategorySelection';
 import MainlandLegalStructure from './mainland/legalStructure';
-import MainlandBusinessActivity from './mainland/businessActivity';
 import MainlandBusinessName from './mainland/businessName';
 import Dashboard from './freezone/dashboard';
+import MainlandContactInformation from './mainland/ContactInformation';
+import MainlandEmployeeCount from './mainland/EmployeeCount';
+import MainlandBusinessProposal from './mainland/BusinessProposal';
+import MainlandNotes from './mainland/Notes';
 
 // Freezone Screens
 import Step2CompanyStructure from './step2companystructure';
@@ -32,6 +35,41 @@ export default function OnboardingContainer() {
   const [currentStep, setCurrentStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState({});
   const [onboardingId, setOnboardingId] = useState(null);
+
+  const handleSubmitMainland = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const user_id = user?.user_id;
+      
+      if (!onboardingId) {
+        console.error('No onboarding ID found');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('Onboarding')
+        .update({
+          business_name: onboardingData.businessName,
+          legal_structure: onboardingData.legalStructure,
+          contact_name: onboardingData.contactName,
+          contact_phone: onboardingData.contactPhone,
+          contact_email: onboardingData.contactEmail,
+          employee_count: onboardingData.employeeCount,
+          business_proposal: onboardingData.businessProposal,
+          notes: onboardingData.notes,
+          status: 'submitted',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', onboardingId);
+
+      if (error) throw error;
+
+      setCurrentStep(8); // Navigate to confirmation step
+    } catch (error) {
+      console.error('Error submitting mainland application:', error);
+      // Handle error (show toast, etc.)
+    }
+  };
 
   useEffect(() => {
     // Fetch or create onboarding row for the logged-in user
@@ -123,38 +161,49 @@ export default function OnboardingContainer() {
     if (category === 'mainland') {
       switch (currentStep) {
         case 1:
-          return (
-            <MainlandBusinessName
-              onNext={(data) => {
-                if (data?.backToCategory) {
-                  setCategory(null);
-                } else {
-                  nextStep(data);
-                }
-              }}
-            />
-          );
+          return <MainlandBusinessName onNext={(data) => data?.backToCategory ? setCategory(null) : nextStep(data)} />;
         case 2:
-          return (
-            <MainlandLegalStructure
-              onNext={nextStep}
-              onPrev={() => setCurrentStep(1)}
-              recommended={null}
-            />
-          );
+          return <MainlandLegalStructure onNext={nextStep} onPrev={() => setCurrentStep(1)} recommended={null} />;
         case 3:
           return (
-            <MainlandBusinessActivity
-              industry={null}
-              onNext={nextStep}
+            <MainlandContactInformation
+              formData={onboardingData}
+              setFormData={(data) => setOnboardingData(prev => ({ ...prev, ...data }))}
+              onNext={() => nextStep()}
               onPrev={() => setCurrentStep(2)}
+            />
+          );
+        case 4:  // Now this is EmployeeCount (previously was step 5)
+          return (
+            <MainlandEmployeeCount
+              formData={onboardingData}
+              setFormData={(data) => setOnboardingData(prev => ({ ...prev, ...data }))}
+              onNext={() => nextStep()}
+              onPrev={() => setCurrentStep(3)}  // Goes back to ContactInformation now
+            />
+          );
+        case 5:  // Now this is BusinessProposal (previously was step 6)
+          return (
+            <MainlandBusinessProposal
+              formData={onboardingData}
+              setFormData={(data) => setOnboardingData(prev => ({ ...prev, ...data }))}
+              onNext={() => nextStep()}
+              onPrev={() => setCurrentStep(4)}  // Goes back to EmployeeCount now
+            />
+          );
+        case 6:  // Now this is Notes (previously was step 7)
+          return (
+            <MainlandNotes
+              formData={onboardingData}
+              setFormData={(data) => setOnboardingData(prev => ({ ...prev, ...data }))}
+              onSubmit={handleSubmitMainland}
+              onPrev={() => setCurrentStep(5)}  // Goes back to BusinessProposal now
             />
           );
         default:
           return <div className="p-5 text-white">Mainland step not implemented yet.</div>;
       }
     }
-
     if (category === 'freezone') {
       // Wait for onboardingId before rendering steps that require it
       if (!onboardingId && currentStep > 0) {

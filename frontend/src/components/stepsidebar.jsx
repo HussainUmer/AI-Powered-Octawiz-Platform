@@ -4,15 +4,10 @@ import React from 'react';
 const steps = [
   { id: 1, label: 'Business Name' },
   { id: 2, label: 'Industry Selection' },
-  { id: 3, label: 'Business Activities' },
-  { id: 4, label: 'Shareholder Details' },
-  { id: 5, label: 'Office Space' },
-  { id: 6, label: 'Document Upload' },
-  { id: 7, label: 'Review & Confirm' },
-  { id: 8, label: 'Payment' },
-  { id: 9, label: 'Processing' },
-  { id: 10, label: 'Bank Account Setup' },
-  { id: 11, label: 'Extras & Compliance' },
+  { id: 3, label: 'Contact Information' },
+  { id: 4, label: 'Estimated no of Employees' },
+  { id: 5, label: 'Business Proposal' },
+  { id: 6, label: 'Notes' },
 ];
 
 export default function StepsSidebar({ currentStep }) {

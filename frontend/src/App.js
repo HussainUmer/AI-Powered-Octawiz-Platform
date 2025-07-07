@@ -11,6 +11,8 @@ import OnboardingContainer from './pages/maincontainer';
 // <<< NEW: import the Offshore wizard
 import OffshoreOnboardingWizard from './pages/Offshore/OffshoreOnboarding';
 
+import Dashboard from './pages/freezone/dashboard';
+
 
 
 export default function App() {
@@ -26,6 +28,7 @@ export default function App() {
 
         {/* Mainland & Freezone share this container */}
         <Route path="/onboarding" element={<OnboardingContainer />} />
+        <Route path="/dashboard" element={<Dashboard />} />
 
         <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>

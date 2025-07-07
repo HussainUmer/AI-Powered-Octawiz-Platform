@@ -12,7 +12,7 @@ const businessDocs = [
   // Add more business doc types as needed
 ];
 
-export default function Step12UploadDocuments({ onNext, onPrev, onboardingId }) {
+export default function Step12UploadDocuments({ onNext, onPrev, onboardingId, previousDocuments = [] }) {
   const [stakeholders, setStakeholders] = useState([]);
   const [personalFiles, setPersonalFiles] = useState({}); // { shareholder_id: { docType: File } }
   const [businessFiles, setBusinessFiles] = useState({}); // { docType: File }
@@ -32,31 +32,51 @@ export default function Step12UploadDocuments({ onNext, onPrev, onboardingId }) 
     fetchStakeholders();
   }, [onboardingId]);
 
+  // Set previousDocs from previousDocuments prop on first mount after login
   useEffect(() => {
-    // Fetch previously uploaded documents for this onboarding
-    const fetchPreviousDocs = async () => {
-      const { data, error } = await supabase
-        .from('Documents')
-        .select('*')
-        .eq('onboarding_id', onboardingId);
-      if (!error && data) {
-        const personal = {};
-        const business = {};
-        data.forEach(doc => {
-          if (doc.type === 'personal' && doc.shareholder_id) {
-            if (!personal[doc.shareholder_id]) personal[doc.shareholder_id] = {};
-            // Use doc.name as label, but also map by doc type (from label)
-            const docType = personalDocs.find(d => d.label === doc.name)?.type;
-            if (docType) personal[doc.shareholder_id][docType] = doc;
-          } else if (doc.type === 'business') {
-            const docType = businessDocs.find(d => d.label === doc.name)?.type;
-            if (docType) business[docType] = doc;
-          }
-        });
-        setPreviousDocs({ personal, business });
-      }
-    };
-    if (onboardingId) fetchPreviousDocs();
+    if (previousDocuments && previousDocuments.length > 0) {
+      const personal = {};
+      const business = {};
+      previousDocuments.forEach(doc => {
+        if (doc.type === 'personal' && doc.shareholder_id) {
+          if (!personal[doc.shareholder_id]) personal[doc.shareholder_id] = {};
+          const docType = personalDocs.find(d => d.label === doc.name)?.type;
+          if (docType) personal[doc.shareholder_id][docType] = doc;
+        } else if (doc.type === 'business') {
+          const docType = businessDocs.find(d => d.label === doc.name)?.type;
+          if (docType) business[docType] = doc;
+        }
+      });
+      setPreviousDocs({ personal, business });
+    }
+  }, [previousDocuments]);
+
+  // Always fetch latest documents from DB when onboardingId changes (but only if not just set from props)
+  useEffect(() => {
+    if (onboardingId) {
+      const fetchPreviousDocs = async () => {
+        const { data, error } = await supabase
+          .from('Documents')
+          .select('*')
+          .eq('onboarding_id', onboardingId);
+        if (!error && data && data.length > 0) {
+          const personal = {};
+          const business = {};
+          data.forEach(doc => {
+            if (doc.type === 'personal' && doc.shareholder_id) {
+              if (!personal[doc.shareholder_id]) personal[doc.shareholder_id] = {};
+              const docType = personalDocs.find(d => d.label === doc.name)?.type;
+              if (docType) personal[doc.shareholder_id][docType] = doc;
+            } else if (doc.type === 'business') {
+              const docType = businessDocs.find(d => d.label === doc.name)?.type;
+              if (docType) business[docType] = doc;
+            }
+          });
+          setPreviousDocs({ personal, business });
+        }
+      };
+      fetchPreviousDocs();
+    }
   }, [onboardingId]);
 
   const handlePersonalFileChange = (shareholder_id, docType, file) => {

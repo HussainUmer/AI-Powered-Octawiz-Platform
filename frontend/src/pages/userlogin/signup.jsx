@@ -42,6 +42,17 @@ const SignupPage = () => {
 
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
+      // Check if user already exists with this email
+      const { data: existingUser, error: checkError } = await supabase
+        .from('Users')
+        .select('user_id')
+        .eq('email', formData.email)
+        .single();
+      if (existingUser) {
+        setSignupError('An account with this email already exists. Please use a different email.');
+        setLoading(false);
+        return;
+      }
       // Insert user into new Users table (case-sensitive table/column names)
       const { data, error } = await supabase.from('Users').insert([
         {

@@ -1,12 +1,32 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
 
-export default function Step14Payment({ onboardingData = {}, onPrev, onPayment }) {
+export default function Step14Payment({ onboardingData = {}, onPrev, onPayment, onboardingId }) {
   const totalPrice = 5000 + (onboardingData.visaRequirement === '6+' ? 2000 : 1000);
   const [card, setCard] = useState({ number: '', name: '', expiry: '', cvv: '' });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCard((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    // Here you would normally process payment, then:
+    const { error: updateError } = await supabase
+      .from('Onboarding')
+      .update({ paid: true })
+      .eq('id', onboardingId);
+    setLoading(false);
+    if (updateError) {
+      setError('Payment succeeded but failed to update status. Please contact support.');
+      return;
+    }
+    if (onPayment) onPayment();
   };
 
   return (
@@ -70,9 +90,10 @@ export default function Step14Payment({ onboardingData = {}, onPrev, onPayment }
               </div>
             </div>
           </div>
+          {error && <div className="alert alert-danger">{error}</div>}
           <div className="button-group">
-            <button className="btn btn-secondary" onClick={onPrev}>Back</button>
-            <button className="btn btn-success" onClick={onPayment}>Pay Now</button>
+            <button className="btn btn-secondary" onClick={onPrev} disabled={loading}>Back</button>
+            <button className="btn btn-success" onClick={handlePayment} disabled={loading}>{loading ? 'Processing...' : 'Pay Now'}</button>
           </div>
         </div>
       </div>

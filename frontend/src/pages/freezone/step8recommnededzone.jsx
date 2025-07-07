@@ -62,28 +62,37 @@ export default function Step8ZoneRecommendation({ onNext, onPrev, onboardingId, 
           <p className="subtitle">
             Based on your business details, we recommend the following free zone for your company:
           </p>
+          <button
+            className="btn btn-sm btn-outline-light mb-3"
+            onClick={togglePopup}
+          >
+            Why is this recommended?
+          </button>
           <div className="options-container">
-            {freezones.map((fz) => (
-              <div
-                key={fz.id}
-                className={`option-card ${selected === fz.id ? 'selected' : ''}`}
-                onClick={() => handleFreezoneSelect(fz.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && handleFreezoneSelect(fz.id)}
-                style={{ marginBottom: '1rem' }}
-              >
-                <input
-                  type="radio"
-                  checked={selected === fz.id}
-                  onChange={() => handleFreezoneSelect(fz.id)}
-                  id={fz.id}
-                  name="freezone"
-                  className="option-radio"
-                />
-                <label htmlFor={fz.id} className="ms-2">{fz.name}</label>
-              </div>
-            ))}
+            <div className="freezone-list">
+              {freezones.map((freezone) => (
+                <div
+                  key={freezone.id}
+                  className={`option-card ${selected === freezone.id ? 'selected' : ''}`}
+                  onClick={() => handleFreezoneSelect(freezone.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && handleFreezoneSelect(freezone.id)}
+                >
+                  <div className="option-name">
+                    {freezone.name}
+                    {freezone.name === recommendedFreezone && (
+                      <span className="recommended-tag">Recommended</span>
+                    )}
+                  </div>
+                  {selected === freezone.id && (
+                    <div className="freezone-details">
+                      {freezone.details || ''}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
           {error && <div className="text-danger mt-2">{error}</div>}
           <div className="button-group">

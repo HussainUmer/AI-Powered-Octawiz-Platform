@@ -1,8 +1,130 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient'; // Placeholder for Supabase Client
 
 export default function Dashboard() {
-  // Redirect to signin page on logout
+  const [onboardingRecords, setOnboardingRecords] = useState([]);
+  const [documents, setDocuments] = useState([]);
+  const [progress, setProgress] = useState(0);
+  const [userId, setUserId] = useState(null);
+  const [username, setUsername] = useState(null);
+
+  // Fetch user ID from localStorage and onboarding data
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user')); // Assuming user is stored as JSON
+    console.log('Stored User:', storedUser);
+    if (storedUser && storedUser.user_id) {
+      setUserId(storedUser.user_id);
+      setUsername(storedUser.first_name || 'User'); // Set username if available
+      fetchOnboardingData(storedUser.user_id);
+    } else {
+      console.error('No user found in localStorage');
+      // Optionally redirect to login
+      window.location.href = '/pages/userlogin/signin';
+    }
+  }, []);
+
+  // Fetch onboarding data based on user_id or shareholder_id
+  const fetchOnboardingData = async (userId) => {
+    try {
+      // Fetch onboarding records where user_id matches
+      const { data: userOnboardings, error: userError } = await supabase
+        .from('Onboarding')
+        .select(`
+          *,
+          Industry(name),
+          Activities(name),
+          Owner_structure(struture_name),
+          Freezones(name)
+        `)
+        .eq('user_id', userId);
+
+      if (userError) throw userError;
+      console.log('User Onboardings:', userOnboardings);
+      // Fetch onboarding records where shareholder_id matches
+      const { data: shareholderOnboardings, error: shareholderError } = await supabase
+        .from('Shareholder')
+        .select(`
+          onboarding_id,
+          Onboarding(
+            *,
+            Industry(name),
+            Activities(name),
+            Owner_structure(struture_name),
+            Freezones(name)
+          )
+        `)
+        .eq('shareholder_id', userId); // Assuming shareholder_id is stored in localStorage if the user is a shareholder
+
+      if (shareholderError) throw shareholderError;
+      console.log('Shareholder Onboardings:', shareholderOnboardings);
+      // Combine and deduplicate onboarding records
+      const combinedOnboardings = [
+        ...(userOnboardings || []),
+        ...(shareholderOnboardings || []).map((s) => s.Onboarding),
+      ].filter(
+        (value, index, self) =>
+          index === self.findIndex((t) => t.id === value.id)
+      );
+
+      console.log('Combined Onboardings:', combinedOnboardings);
+      setOnboardingRecords(combinedOnboardings);
+
+      // Fetch documents for all onboarding records
+      const onboardingIds = combinedOnboardings.map((record) => record.id);
+      if (onboardingIds.length > 0) {
+        fetchDocumentsData(onboardingIds);
+      }
+    } catch (error) {
+      console.error('Error fetching onboarding data:', error);
+    }
+  };
+
+  // Fetch documents data for multiple onboarding IDs
+  const fetchDocumentsData = async (onboardingIds) => {
+    try {
+      const { data, error } = await supabase
+        .from('Documents')
+        .select(`
+          *,
+          Shareholder(name)
+        `)
+        .in('onboarding_id', onboardingIds);
+
+      if (error) throw error;
+      setDocuments(data);
+    } catch (error) {
+      console.error('Error fetching documents data:', error);
+    }
+  };
+
+  // Calculate progress based on completed fields in onboarding and documents
+  useEffect(() => {
+    let filledFields = 0;
+    let totalFields = onboardingRecords.length * 7; // 7 fields per onboarding record
+
+    // Count fields in onboarding data
+    onboardingRecords.forEach((record) => {
+      for (let key in record) {
+        if (key !== 'id' && record[key] !== null && record[key] !== '') {
+          filledFields++;
+        }
+      }
+    });
+
+    // Count uploaded documents
+    documents.forEach((doc) => {
+      if (doc.status === 'uploaded') {
+        filledFields++;
+      }
+    });
+
+    // Calculate and set progress percentage
+    const total = totalFields + documents.length;
+    setProgress(total > 0 ? Math.round((filledFields / total) * 100) : 0);
+  }, [onboardingRecords, documents]);
+
   const handleLogout = () => {
+    localStorage.removeItem('user');
     window.location.href = '/pages/userlogin/signin';
   };
 
@@ -10,103 +132,136 @@ export default function Dashboard() {
     <div className="dashboard bg-dark text-white position-relative min-vh-100">
       <div className="d-flex align-items-center justify-content-center min-vh-100">
         <div className="container">
-          <div className="glass-card p-5 mx-auto">
-            <h2 className="mb-4 text-center title">Welcome to Your Dashboard</h2>
-            <div className="row g-4">
-              {/* Progress Tracker */}
-              <div className="col-md-6">
-                <div className="card-box">
-                  <div className="d-flex align-items-center mb-3">
-                    <span className="icon">🚀</span>
-                    <h5 className="mb-0">Progress Tracker</h5>
-                  </div>
-                  <div className="progress">
-                    <div className="progress-bar bg-success">
-                      70% Complete
-                    </div>
+          {/* Header Section */}
+          <header className="dashboard-header d-flex justify-content-between align-items-center mb-4">
+            <h2 className="title">Welcome to Your Dashboard, {username}</h2>
+            <div className="profile-icon">
+              <span className="icon" style={{ fontSize: '30px' }}>
+                👤
+              </span>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <div className="row g-4">
+            {/* Progress Tracker Section */}
+            <div className="col-md-6">
+              <div className="card-box dashboard-progress-tracker">
+                <div className="d-flex align-items-center mb-3">
+                  <span className="icon">🚀</span>
+                  <h5 className="mb-0">Progress Tracker</h5>
+                </div>
+                <div className="progress">
+                  <div className="progress-bar bg-success" style={{ width: `${progress}%` }}>
+                    {progress}% Complete
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Document Vault */}
-              <div className="col-md-6">
-                <div className="card-box">
-                  <div className="d-flex align-items-center mb-3">
-                    <span className="icon">🗂️</span>
-                    <h5 className="mb-0">Document Vault</h5>
-                  </div>
-                  <div className="d-flex gap-3 flex-wrap justify-content-center">
-                    <div className="vault-item">
+            {/* Document Vault Section */}
+            <div className="col-md-6">
+              <div className="card-box dashboard-document-vault">
+                <div className="d-flex align-items-center mb-3">
+                  <span className="icon">🗂️</span>
+                  <h5 className="mb-0">Document Vault</h5>
+                </div>
+                <div className="d-flex gap-3 flex-wrap justify-content-center">
+                  {documents.map((doc) => (
+                    <div className="vault-item" key={doc.id}>
                       <div className="vault-icon">📄</div>
-                      <div>Passport</div>
-                      <button className="btn btn-sm btn-outline-light">Download</button>
+                      <div>{doc.type}</div>
+                      <div>Shareholder: {doc.Shareholder?.name || 'N/A'}</div>
+                      <div>Onboarding ID: {doc.onboarding_id}</div>
+                      {doc.status === 'uploaded' ? (
+                        <button className="btn btn-sm btn-outline-light">Download</button>
+                      ) : (
+                        <button className="btn btn-sm btn-outline-warning">Upload</button>
+                      )}
                     </div>
-                    <div className="vault-item">
-                      <div className="vault-icon">📜</div>
-                      <div>MoA</div>
-                      <button className="btn btn-sm btn-outline-light">Download</button>
-                    </div>
-                    <div className="vault-item">
-                      <div className="vault-icon">🏷️</div>
-                      <div>License</div>
-                      <button className="btn btn-sm btn-outline-light">Download</button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
+            </div>
 
-              {/* Application Timeline */}
-              <div className="col-md-6">
-                <div className="card-box mt-4">
-                  <div className="d-flex align-items-center mb-3">
-                    <span className="icon">⏳</span>
-                    <h5 className="mb-0">Application Timeline</h5>
-                  </div>
-                  <ul className="timeline">
-                    <li className="mb-2"><span className="badge bg-success me-2">✔</span>Name Approval</li>
-                    <li className="mb-2"><span className="badge bg-warning text-dark me-2">⏳</span>License Ready</li>
-                  </ul>
+            {/* Application Timeline Section */}
+            <div className="col-md-6">
+              <div className="card-box dashboard-timeline mt-4">
+                <div className="d-flex align-items-center mb-3">
+                  <span className="icon">⏳</span>
+                  <h5 className="mb-0">Application Timeline</h5>
+                </div>
+                <ul className="timeline list-unstyled">
+                  <li className="mb-2">
+                    <span className="badge bg-success me-2">✔</span>Name Approval
+                  </li>
+                  <li className="mb-2">
+                    <span className="badge bg-warning text-dark me-2">⏳</span>License Ready
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Onboarding Information Section */}
+          {onboardingRecords.length > 0 ? (
+            onboardingRecords.map((onboardingData) => (
+              <div className="dashboard-onboarding-info mt-4" key={onboardingData.id}>
+                <h5>Onboarding Information (ID: {onboardingData.id})</h5>
+                <div className="info-item">
+                  <span>Industry:</span>{' '}
+                  <strong>{onboardingData.Industry?.name || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
+                </div>
+                <div className="info-item">
+                  <span>Activity:</span>{' '}
+                  <strong>{onboardingData.Activities?.name || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
+                </div>
+                <div className="info-item">
+                  <span>Visa Requirement:</span>{' '}
+                  <strong>{onboardingData.visa_requirment || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
+                </div>
+                <div className="info-item">
+                  <span>Office Type:</span>{' '}
+                  <strong>{onboardingData.office_type || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
+                </div>
+                <div className="info-item">
+                  <span>Ownership:</span>{' '}
+                  <strong>{onboardingData.Owner_structure?.struture_name || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
+                </div>
+                <div className="info-item">
+                  <span>Freezone:</span>{' '}
+                  <strong>{onboardingData.Freezones?.name || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
+                </div>
+                <div className="info-item">
+                  <span>Trade Name:</span>{' '}
+                  <strong>{onboardingData.trade_name || 'Not Provided'}</strong>
+                  <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="dashboard-onboarding-info mt-4">
+              <h5>No Onboarding Information Available</h5>
+            </div>
+          )}
 
-            </div>
-            {/* Logout button at the end, centered */}
-            <div className="w-100 d-flex justify-content-center mt-5">
-              <button
-                className="btn btn-outline-danger px-5 py-2"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </div>
+          {/* Logout Button */}
+          <div className="w-100 d-flex justify-content-center mt-5">
+            <button className="btn btn-outline-danger px-5 py-2" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

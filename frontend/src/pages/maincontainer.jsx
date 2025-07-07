@@ -1,3 +1,128 @@
+// import React, { useEffect, useState } from 'react';
+// import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+// import { supabase } from './supabaseClient';
+
+// // Freezone Steps
+// import Step2CompanyStructure from './step2companystructure';
+// import Step3Industry from './freezone/step3industry';
+// import Step4ActivitySelection from './freezone/step4ActivitySelection';
+// import Step5VisaRequirement from './freezone/step5visarequirment';
+// import Step6OfficePreference from './freezone/step6officepref';
+// import Step7Ownership from './freezone/step7ownership';
+// import Step8ZoneRecommendation from './freezone/step8recommnededzone';
+// import Step9TradeName from './freezone/step9tradename';
+// import Step10Stakeholders from './freezone/step10stakeholders';
+// import Step11ShareCapital from './freezone/step11sharecapital';
+// import Step12UploadDocuments from './freezone/step12uploaddocuments';
+// import Step13ReviewPayment from './freezone/step13reviewpayment';
+// import Step14Payment from './freezone/step14payment';
+// import Step14Confirmation from './freezone/step14confirmation';
+// import Dashboard from './freezone/dashboard';
+
+// // Mainland Steps
+// import MainlandBusinessName from './mainland/businessName';
+// import MainlandLegalStructure from './mainland/legalStructure';
+// import MainlandBusinessActivity from './mainland/businessActivity';
+
+// // Shared
+// import CategorySelection from './CategorySelection';
+// import NotAvailable from './notavailiable';
+// import StepsSidebar from '../components/stepsidebar';
+// import StepsSidebar_freezone from '../components/stepsidebar_freezone';
+// import ChatBot from '../components/chatbot';
+
+// export default function OnboardingContainer() {
+//   const [category, setCategory] = useState(null);
+//   const [onboardingId, setOnboardingId] = useState(null);
+//   const [onboardingData, setOnboardingData] = useState({});
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const fetchOrCreateOnboarding = async () => {
+//       const user = JSON.parse(localStorage.getItem('user'));
+//       const user_id = user?.user_id;
+//       if (!user_id) return;
+
+//       const { data } = await supabase.from('Onboarding').select('*').eq('user_id', user_id).single();
+//       if (data && data.id) {
+//         setOnboardingId(data.id);
+//         let prefill = {};
+//         if (data.industry) prefill.industryId = data.industry;
+//         if (data.activity) {
+//           const { data: act } = await supabase.from('Activities').select('name').eq('id', data.activity).single();
+//           prefill.activities = act?.name ? [act.name] : [];
+//         }
+//         if (data.custom_activity) prefill.customActivity = data.custom_activity;
+//         if (data.ownership) prefill.ownership = data.ownership;
+//         if (data.freezone) prefill.freezone = data.freezone;
+//         if (data.visa_requirement) prefill.visa_requirement = data.visa_requirement;
+//         if (data.office_type) prefill.office_type = data.office_type;
+//         if (data.trade_name) prefill.trade_name = data.trade_name;
+//         setOnboardingData(prefill);
+//       } else {
+//         const { data: newData } = await supabase.from('Onboarding').insert([{ user_id }]).select('id').single();
+//         if (newData?.id) setOnboardingId(newData.id);
+//       }
+//     };
+//     fetchOrCreateOnboarding();
+//   }, []);
+
+//   const handleNext = (data, path) => {
+//     if (data && typeof data === 'object') {
+//       setOnboardingData(prev => ({ ...prev, ...data }));
+//     }
+//     navigate(path);
+//   };
+
+//   const handleBack = (fallbackPath = '/onboarding') => {
+//     navigate(-1, { replace: false });
+//   };
+
+//   const handleCategorySelect = (cat) => {
+//     setCategory(cat);
+//     setOnboardingData({ category: cat });
+//     navigate(`/onboarding/${cat}/industry`);
+//   };
+
+//   return (
+//     <div className="d-flex vh-100 bg-dark text-white">
+//       {category === 'freezone' && <StepsSidebar_freezone />}
+//       {category === 'mainland' && <StepsSidebar />}
+//       <main className="flex-grow-1 overflow-auto p-5">
+//         <Routes>
+//           <Route index element={<CategorySelection onSelect={handleCategorySelect} />} />
+
+//           {/* Mainland Routes */}
+//           <Route path="mainland/name" element={<MainlandBusinessName onNext={(data) => handleNext(data, '/onboarding/mainland/legal')} />} />
+//           <Route path="mainland/legal" element={<MainlandLegalStructure onNext={(data) => handleNext(data, '/onboarding/mainland/activity')} onPrev={handleBack} />} />
+//           <Route path="mainland/activity" element={<MainlandBusinessActivity onNext={(data) => handleNext(data, '/onboarding/mainland/complete')} onPrev={handleBack} />} />
+
+//           {/* Freezone Routes */}
+//           <Route path="freezone/company-structure" element={<Step2CompanyStructure onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/industry')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/industry" element={<Step3Industry onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/activities')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/activities" element={<Step4ActivitySelection onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/ownership')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/ownership" element={<Step7Ownership onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/recommend-zone')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/recommend-zone" element={<Step8ZoneRecommendation onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/visa')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/visa" element={<Step5VisaRequirement onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/office')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/office" element={<Step6OfficePreference onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/tradename')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/tradename" element={<Step9TradeName onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/stakeholders')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/stakeholders" element={<Step10Stakeholders onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/sharecapital')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/sharecapital" element={<Step11ShareCapital onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/documents')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/documents" element={<Step12UploadDocuments onboardingId={onboardingId} onNext={(data) => handleNext(data, '/onboarding/freezone/review')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/review" element={<Step13ReviewPayment onboardingId={onboardingId} onPayment={() => navigate('/onboarding/freezone/payment')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/payment" element={<Step14Payment onboardingId={onboardingId} onPayment={() => navigate('/onboarding/freezone/confirmation')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/confirmation" element={<Step14Confirmation onboardingId={onboardingId} onDashboard={() => navigate('/onboarding/freezone/dashboard')} onPrev={handleBack} onboardingData={onboardingData} />} />
+//           <Route path="freezone/dashboard" element={<Dashboard onboardingId={onboardingId} />} />
+
+//           <Route path="*" element={<NotAvailable onBack={() => navigate('/onboarding')} />} />
+//         </Routes>
+//       </main>
+//       <ChatBot />
+//     </div>
+//   );
+// }
+
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import CategorySelection from './CategorySelection';

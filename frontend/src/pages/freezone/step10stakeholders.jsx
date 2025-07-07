@@ -34,47 +34,22 @@ export default function Step10Stakeholders({ onNext, onPrev, onboardingId, initi
   const handleContinue = async () => {
     setLoading(true);
     setError('');
-    try {
-      // First, delete all related documents for this onboardingId
-      const { error: docDeleteError } = await supabase
-        .from('Documents')
-        .delete()
-        .eq('onboarding_id', onboardingId);
-      if (docDeleteError) {
-        setError('Failed to clear previous stakeholder documents: ' + docDeleteError.message);
-        setLoading(false);
-        return;
-      }
-      // Then, delete all existing stakeholders for this onboardingId
-      const { error: deleteError } = await supabase
-        .from('Shareholder')
-        .delete()
-        .eq('onboarding_id', onboardingId);
-      if (deleteError) {
-        setError('Failed to clear previous stakeholders: ' + deleteError.message);
-        setLoading(false);
-        return;
-      }
-      // Insert new stakeholders
-      const rows = stakeholders.map(s => ({
-        name: s.name,
-        nationality: s.nationality,
-        passport_no: s.passport,
-        email: s.email,
-        onboarding_id: onboardingId,
-      }));
-      const { error } = await supabase.from('Shareholder').insert(rows);
-      setLoading(false);
-      if (error) {
-        setError('Failed to save stakeholders. ' + (error.message || 'Please try again.'));
-        console.error('Supabase insert error:', error);
-        return;
-      }
-      onNext({ stakeholders });
-    } catch (e) {
-      setError('Unexpected error: ' + e.message);
-      setLoading(false);
+    // Save all stakeholders to Shareholder table
+    const rows = stakeholders.map(s => ({
+      name: s.name,
+      nationality: s.nationality,
+      passport_no: s.passport,
+      email: s.email,
+      onboarding_id: onboardingId,
+    }));
+    console.log('Saving stakeholders:', rows);
+    const { error } = await supabase.from('Shareholder').insert(rows);
+    setLoading(false);
+    if (error) {
+      setError('Failed to save stakeholders. Please try again.');
+      return;
     }
+    onNext({ stakeholders });
   };
 
   return (

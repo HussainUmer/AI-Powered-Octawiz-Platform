@@ -13,6 +13,9 @@ import OffshoreOnboardingWizard from './pages/Offshore/OffshoreOnboarding';
 
 import Dashboard from './pages/freezone/dashboard';
 
+import AdminDashboard from './pages/admin/AdminDashboard';
+import UserDetails from './pages/admin/UserDetails';
+
 
 
 export default function App() {
@@ -29,6 +32,9 @@ export default function App() {
         {/* Mainland & Freezone share this container */}
         <Route path="/onboarding" element={<OnboardingContainer />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/user/:onboardingId" element={<UserDetails />} />
 
         <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>

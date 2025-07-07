@@ -7,6 +7,7 @@ const SignInPage = () => {
   const [errors, setErrors] = useState({});
   const [signinError, setSigninError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,7 +24,30 @@ const SignInPage = () => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       setLoading(true);
-      // Query the Users table (case-sensitive)
+      if (isAdmin) {
+        // Admin sign in using Admins table
+        const { data, error } = await supabase
+          .from('Admins')
+          .select('*')
+          .eq('email', formData.email)
+          .single();
+        setLoading(false);
+        if (error || !data) {
+          setSigninError('Invalid admin email or password.');
+          return;
+        }
+        if (data.password !== formData.password) {
+          setSigninError('Invalid admin email or password.');
+          return;
+        }
+        // Store admin info in localStorage
+        localStorage.setItem('admin', JSON.stringify({
+          email: data.email
+        }));
+        navigate('/admin');
+        return;
+      }
+      // User sign in using Users table
       const { data, error } = await supabase
         .from('Users')
         .select('*')
@@ -34,18 +58,15 @@ const SignInPage = () => {
         setSigninError('Invalid email or password.');
         return;
       }
-      // Compare password (plain text for now)
       if (data.password !== formData.password) {
         setSigninError('Invalid email or password.');
         return;
       }
-      // Store user info in localStorage for session persistence
       localStorage.setItem('user', JSON.stringify({
         user_id: data.user_id,
         first_name: data.first_name,
         last_name: data.last_name,
-        email: data.email,
-        role: data.role,
+        email: data.email
       }));
       // Fetch onboarding record and check payment status
       setLoading(true);
@@ -58,7 +79,6 @@ const SignInPage = () => {
       if (onboarding && onboarding.paid === true) {
         navigate('/dashboard');
       } else {
-        // If paid is false or null, show onboarding with previous progress
         navigate('/onboarding');
       }
     }
@@ -86,7 +106,6 @@ const SignInPage = () => {
             />
             {errors.email && <div className="invalid-feedback">{errors.email}</div>}
           </div>
-
           <div className="mb-2">
             <label htmlFor="password" className="form-label">Password</label>
             <input
@@ -100,7 +119,18 @@ const SignInPage = () => {
             />
             {errors.password && <div className="invalid-feedback">{errors.password}</div>}
           </div>
-
+          <div className="form-check mb-3">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              id="adminCheck"
+              checked={isAdmin}
+              onChange={() => setIsAdmin(!isAdmin)}
+            />
+            <label className="form-check-label" htmlFor="adminCheck">
+              Sign in as Admin
+            </label>
+          </div>
           <button type="submit" className="btn btn-primary w-100" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

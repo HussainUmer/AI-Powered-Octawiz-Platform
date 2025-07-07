@@ -8,9 +8,6 @@ import SignInPage from './pages/userlogin/signin';
 import SignupPage from './pages/userlogin/signup';
 import OnboardingContainer from './pages/maincontainer';
 
-// <<< NEW: import the Offshore wizard
-import OffshoreOnboardingWizard from './pages/Offshore/OffshoreOnboarding';
-
 import Dashboard from './pages/freezone/dashboard';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -25,9 +22,6 @@ export default function App() {
         <Route path="/" element={<Navigate to="/signin" replace />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignupPage />} />
-
-        {/* Offshore is now its own top‐level route */}
-        <Route path="/offshore" element={<OffshoreOnboardingWizard />} />
 
         {/* Mainland & Freezone share this container */}
         <Route path="/onboarding" element={<OnboardingContainer />} />

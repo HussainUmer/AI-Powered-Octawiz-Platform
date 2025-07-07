@@ -125,7 +125,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    window.location.href = '/pages/userlogin/signin';
+    window.location.href = '/signin';
   };
 
   return (

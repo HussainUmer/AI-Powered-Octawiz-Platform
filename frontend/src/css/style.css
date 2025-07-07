@@ -205,20 +205,25 @@ input.form-control:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 3rem;
+  padding: 2rem;
   background-color: var(--color-bg);
+  overflow-y: auto;
+  height: 100%;
+  min-height: 0; /* helps child shrink correctly inside flexbox */
 }
 
-/* Card container same as before */
 .card-container {
-  max-width: 600px;
-  max-height: 100vh; 
   width: 100%;
+  max-width: 600px;
   padding: 2rem 2.5rem;
-  background-color: rgba(255 255 255 / 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
   color: var(--color-text);
+  
+  /* NEW: Prevent height overflow */
+  max-height: calc(100vh - 4rem); /* adjust based on .form-container padding */
+  overflow-y: auto;
 }
 
 .title {

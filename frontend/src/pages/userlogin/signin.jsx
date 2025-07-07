@@ -47,7 +47,20 @@ const SignInPage = () => {
         email: data.email,
         role: data.role,
       }));
-      navigate('/onboarding');
+      // Fetch onboarding record and check payment status
+      setLoading(true);
+      const { data: onboarding, error: onboardingError } = await supabase
+        .from('Onboarding')
+        .select('paid')
+        .eq('user_id', data.user_id)
+        .single();
+      setLoading(false);
+      if (onboarding && onboarding.paid === true) {
+        navigate('/dashboard');
+      } else {
+        // If paid is false or null, show onboarding with previous progress
+        navigate('/onboarding');
+      }
     }
   };
 

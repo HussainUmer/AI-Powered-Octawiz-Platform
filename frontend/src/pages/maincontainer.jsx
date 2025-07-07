@@ -54,7 +54,7 @@ export default function OnboardingContainer() {
         if (data.activity || data.custom_activity) {
           if (data.activity) {
             // Fetch activity name from Activities table
-            const { data: act, error: actErr } = await supabase
+            const { data: act } = await supabase
               .from('Activities')
               .select('name')
               .eq('id', data.activity)
@@ -70,7 +70,30 @@ export default function OnboardingContainer() {
         if (data.visa_requirement) onboardingData.visa_requirement = data.visa_requirement;
         if (data.office_type) onboardingData.office_type = data.office_type;
         if (data.trade_name) onboardingData.trade_name = data.trade_name;
-        // ...add more fields as needed for prefill...
+        // --- FETCH STAKEHOLDERS ---
+        const { data: stakeholders } = await supabase
+          .from('Shareholder')
+          .select('name, nationality, passport_no, email, share_capital, percentage')
+          .eq('onboarding_id', data.id);
+        if (stakeholders && stakeholders.length > 0) {
+          onboardingData.stakeholders = stakeholders.map(s => ({
+            name: s.name,
+            nationality: s.nationality,
+            passport: s.passport_no,
+            email: s.email
+          }));
+          onboardingData.equity = stakeholders.map(s => s.percentage);
+          onboardingData.shareCapital = stakeholders[0].share_capital;
+        }
+        // --- FETCH DOCUMENTS ---
+        const { data: documents } = await supabase
+          .from('Documents')
+          .select('*')
+          .eq('onboarding_id', data.id);
+        if (documents && documents.length > 0) {
+          onboardingData.documents = documents;
+        }
+        // ...add more fields as needed for prefill (e.g. documents)...
         setCurrentStep(1); // Always start from first screen
         setOnboardingData(onboardingData);
       } else {
@@ -198,7 +221,7 @@ export default function OnboardingContainer() {
         case 9:
           return <Step11ShareCapital onNext={nextStep} onPrev={prevStep} stakeholders={onboardingData.stakeholders || []} onboardingId={onboardingId} initialEquity={onboardingData.equity} initialShareCapital={onboardingData.shareCapital} />;
         case 10:
-          return <Step12UploadDocuments onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} />;
+          return <Step12UploadDocuments onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} previousDocuments={onboardingData.documents || []} />;
         case 11:
           return <Step13ReviewPayment onboardingData={onboardingData} onPrev={prevStep} onPayment={() => setCurrentStep(12)} onboardingId={onboardingId} />;
         case 12:

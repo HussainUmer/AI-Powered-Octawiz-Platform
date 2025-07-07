@@ -9,7 +9,7 @@ import SignupPage from './pages/userlogin/signup';
 import OnboardingContainer from './pages/maincontainer';
 
 // <<< NEW: import the Offshore wizard
-import OffshoreOnboardingWizard from './pages/Offshore/OffshoreOnboardingWizard';
+import OffshoreOnboardingWizard from './pages/Offshore/OffshoreOnboarding';
 
 import Dashboard from './pages/freezone/dashboard';
 

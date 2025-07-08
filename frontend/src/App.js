@@ -6,7 +6,6 @@ import './css/style.css';
 import SignInPage from './pages/userlogin/signin';
 import SignupPage from './pages/userlogin/signup';
 import OnboardingContainer from './pages/maincontainer';
-import OffshoreOnboardingWizard from './pages/Offshore/OffshoreOnboarding';
 import Dashboard from './pages/freezone/dashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import UserDetails from './pages/admin/UserDetails';
@@ -32,7 +31,6 @@ export default function App() {
           {/* <Route path="/" element={<Navigate to="/signin" replace />} /> */}
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/signup" element={<SignupPage />} />
-          <Route path="/offshore" element={<OffshoreOnboardingWizard />} />
           <Route path="/onboarding" element={<OnboardingContainer />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />

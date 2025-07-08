@@ -101,9 +101,11 @@ export default function Dashboard() {
   useEffect(() => {
     let filledFields = 0;
     let totalFields = onboardingRecords.length * 7; // 7 fields per onboarding record
+    console.log('Calculating progress for onboarding records:', onboardingRecords.length);
 
     // Count fields in onboarding data
     onboardingRecords.forEach((record) => {
+      console.log('Processing record:', record);
       for (let key in record) {
         if (key !== 'id' && record[key] !== null && record[key] !== '') {
           filledFields++;
@@ -129,16 +131,21 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="dashboard bg-dark text-white position-relative min-vh-100">
+    <div className="dashboard bg-dark text-white position-relative">
       <div className="d-flex align-items-center justify-content-center min-vh-100">
         <div className="container">
           {/* Header Section */}
           <header className="dashboard-header d-flex justify-content-between align-items-center mb-4">
             <h2 className="title">Welcome to Your Dashboard, {username}</h2>
             <div className="profile-icon">
-              <span className="icon" style={{ fontSize: '30px' }}>
+              {/* <span className="icon" style={{ fontSize: '30px' }}>
                 👤
-              </span>
+              </span> */}
+              <div className="w-100 d-flex justify-content-center">
+                  <button className="btn btn-outline-danger px-5 py-2" onClick={handleLogout}>
+                      Logout
+              </button>
+          </div>
             </div>
           </header>
 
@@ -252,11 +259,11 @@ export default function Dashboard() {
           )}
 
           {/* Logout Button */}
-          <div className="w-100 d-flex justify-content-center mt-5">
+          {/* <div className="w-100 d-flex justify-content-center mt-5">
             <button className="btn btn-outline-danger px-5 py-2" onClick={handleLogout}>
               Logout
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

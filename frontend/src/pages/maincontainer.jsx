@@ -37,7 +37,7 @@ import Step14Payment from './freezone/step14payment';
 import NotAvailable from './notavailiable';
 import StepsSidebar from '../components/stepsidebar';
 import StepsSidebar_freezone from '../components/stepsidebar_freezone';
-import ChatBot from '../components/chatbot';
+// import ChatBot from '../components/chatbot';
 
 export default function OnboardingContainer() {
   const [category, setCategory] = useState(null);
@@ -400,7 +400,7 @@ export default function OnboardingContainer() {
       {category === 'mainland' && <StepsSidebar currentStep={currentStep} />}
       {category === 'offshore' && <StepsSidebar_offshore currentStep={currentStep} />}
       <main className="flex-grow-1 overflow-auto p-5">{renderStep()}</main>
-      <ChatBot />
+      {/* <ChatBot /> */}
     </div>
   );
 }

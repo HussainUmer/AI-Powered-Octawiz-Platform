@@ -641,7 +641,7 @@ input.form-control:focus {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  height: 60%;
 }
 
 .dashboard .container {
@@ -755,4 +755,102 @@ input.form-control:focus {
 
 .dashboard-onboarding-info .info-item button:hover {
   background-color: var(--color-primary);
+}
+
+
+
+/* ---------------------Home page Css ---------------------------------------------------------------*/
+
+/* --------------------logo------------------------------------------------ */
+/* Navbar Styling */
+.navbar {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  /* background-color: var(--color-grey-light); */
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); */
+}
+
+/* Logo Styling */
+.navbar-logo {
+  width: 150px; /* Adjust size as per the logo */
+  height: auto;
+  transition: transform 0.3s ease;
+}
+
+/* Hover effect for logo */
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+/* Book a Call Button */
+.navbar-book-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-base);
+  font-weight: 600;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: var(--color-white);
+  transition: background-color 0.3s ease;
+}
+
+.navbar-book-btn:hover {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+
+/* --------------------------first Section Css----------------------------- */
+/* Home Page Styling */
+.home-page-container {
+  background-color: var(--color-gray-light);
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+}
+
+.main-heading {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--color-black);
+  margin-bottom: var(--spacing-md);
+}
+
+.sub-heading {
+  font-size: var(--font-lg);
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  font-weight: 600;
+  padding: 1rem 3rem;
+  transition: background 0.3s ease;
+  border-radius: 42px;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px; /* Optional, for a smooth rounded corner */
+}
+
+/* --------------------------------------------------Footer Css-------------------------------------- */
+/* Footer Styling */
+.footer {
+  background-color: var(--color-white);
+  color: var(--color-muted);
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--color-gray-light);
+}
+
+.footer-text {
+  font-size: var(--font-sm);
+  color: var(--color-muted);
+  margin: 0;
+  font-weight: 400;
 }

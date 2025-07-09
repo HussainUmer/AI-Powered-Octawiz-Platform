@@ -198,14 +198,24 @@ export default function Dashboard() {
                   <span className="icon">⏳</span>
                   <h5 className="mb-0">Application Timeline</h5>
                 </div>
-                <ul className="timeline list-unstyled">
-                  <li className="mb-2">
-                    <span className="badge bg-success me-2">✔</span>Name Approval
-                  </li>
-                  <li className="mb-2">
-                    <span className="badge bg-warning text-dark me-2">⏳</span>License Ready
-                  </li>
-                </ul>
+                {/* Approval Status Badges */}
+                {onboardingRecords.length > 0 && (
+                  <div className="mt-3">
+                    {onboardingRecords.map((onboardingData) => (
+                      <div key={onboardingData.id} className="mb-2">
+                        <span className={`badge me-2 ${onboardingData.visa_approved ? 'bg-success' : 'bg-secondary'}`}>
+                          Visa {onboardingData.visa_approved ? 'Approved' : 'Pending'}
+                        </span>
+                        <span className={`badge me-2 ${onboardingData.license_approved ? 'bg-success' : 'bg-secondary'}`}>
+                          License {onboardingData.license_approved ? 'Approved' : 'Pending'}
+                        </span>
+                        <span className={`badge me-2 ${onboardingData.tradename_approved ? 'bg-success' : 'bg-secondary'}`}>
+                          Trade Name {onboardingData.tradename_approved ? 'Approved' : 'Pending'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

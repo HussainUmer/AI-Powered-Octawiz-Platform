@@ -7,6 +7,7 @@ export default function UserDetails() {
   const [summary, setSummary] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function UserDetails() {
       setLoading(false);
     };
     fetchDetails();
-  }, [onboardingId]);
+  }, [onboardingId, saving]);
 
   const getPublicUrl = (filePath) => {
     return `https://sumolzzumompsruijhfo.supabase.co/storage/v1/object/public/documents/${filePath}`;
@@ -59,6 +60,19 @@ export default function UserDetails() {
   const handleLogout = () => {
     localStorage.removeItem('user');
     window.location.href = '/signin';
+  };
+
+  const handleToggle = async (field) => {
+    if (!summary) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from('Onboarding')
+      .update({ [field]: !summary[field] })
+      .eq('id', onboardingId);
+    setSaving(false);
+    if (!error) {
+      setSummary((prev) => ({ ...prev, [field]: !prev[field] }));
+    }
   };
 
   if (loading) return <div className="d-flex vh-100 bg-dark text-white align-items-center justify-content-center">Loading...</div>;
@@ -108,6 +122,64 @@ export default function UserDetails() {
               </tbody>
             </table>
           </div>
+        </div>
+        {/* Admin Approval Buttons Section */}
+        <div className="mb-2 d-flex gap-3 align-items-center mt-4" style={{ color: '#fff' }}>
+          <strong>Visa Approved:</strong>
+          <button
+            type="button" // Ensures no form submission
+            className={`btn btn-xs ${summary.visa_approved ? 'btn-success' : 'btn-outline-success'}`}
+            style={summary.visa_approved
+              ? { minWidth: 90, fontSize: '0.85rem', padding: '2px 10px', color: '#fff', backgroundColor: '#198754', borderColor: '#198754',
+                  // Force green color with !important
+                  boxShadow: 'none',
+                  outline: 'none',
+                  background: '#198754 !important',
+                  color: '#fff !important',
+                  borderColor: '#198754 !important',
+                }
+              : { minWidth: 90, fontSize: '0.85rem', padding: '2px 10px' }}
+            disabled={saving}
+            onClick={() => handleToggle('visa_approved')}
+          >
+            {summary.visa_approved ? 'Approved' : 'Mark Approved'}
+          </button>
+          <strong>License Approved:</strong>
+          <button
+            type="button"
+            className={`btn btn-xs ${summary.license_approved ? 'btn-success' : 'btn-outline-success'}`}
+            style={summary.license_approved
+              ? { minWidth: 90, fontSize: '0.85rem', padding: '2px 10px', color: '#fff', backgroundColor: '#198754', borderColor: '#198754',
+                  boxShadow: 'none',
+                  outline: 'none',
+                  background: '#198754 !important',
+                  color: '#fff !important',
+                  borderColor: '#198754 !important',
+                }
+              : { minWidth: 90, fontSize: '0.85rem', padding: '2px 10px' }}
+            disabled={saving}
+            onClick={() => handleToggle('license_approved')}
+          >
+            {summary.license_approved ? 'Approved' : 'Mark Approved'}
+          </button>
+          <strong>Trade Name Approved:</strong>
+          <button
+            type="button"
+            className={`btn btn-xs ${summary.tradename_approved ? 'btn-success' : 'btn-outline-success'}`}
+            style={summary.tradename_approved
+              ? { minWidth: 90, fontSize: '0.85rem', padding: '2px 10px', color: '#fff', backgroundColor: '#198754', borderColor: '#198754',
+                  boxShadow: 'none',
+                  outline: 'none',
+                  background: '#198754 !important',
+                  color: '#fff !important',
+                  borderColor: '#198754 !important',
+                }
+              : { minWidth: 90, fontSize: '0.85rem', padding: '2px 10px' }}
+            disabled={saving}
+            onClick={() => handleToggle('tradename_approved')}
+          >
+            {summary.tradename_approved ? 'Approved' : 'Mark Approved'}
+          </button>
         </div>
       </div>
     </div>

@@ -51,36 +51,41 @@ export default function OnboardingContainer() {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       const user_id = user?.user_id;
-      
-      if (!onboardingId) {
-        console.error('No onboarding ID found');
+
+      if (!user_id) {
+        console.error('No user found in localStorage');
         return;
       }
 
       const { error } = await supabase
-        .from('Onboarding')
-        .update({
-          contact_name: onboardingData.contactName,
-          contact_phone: onboardingData.contactPhone,
-          contact_email: onboardingData.contactEmail,
-          business_name: onboardingData.businessName,
-          jurisdiction: onboardingData.jurisdiction,
-          proposal: onboardingData.proposal,
-          share_capital: onboardingData.shareCapital,
-          language: onboardingData.language,
-          notes: onboardingData.notes,
-          status: 'submitted',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', onboardingId);
+        .from('OffshoreUserInfo')
+        .insert([
+          {
+            user_id: user_id,
+            contact_name: onboardingData.contactName || null,
+            contact_phone: onboardingData.contactPhone || null,
+            contact_email: onboardingData.contactEmail || null,
+            business_name: onboardingData.businessName || null,
+            jurisdiction: onboardingData.jurisdiction || null,
+            business_proposal: onboardingData.proposal || null,
+            estimated_share_capital: onboardingData.shareCapital || null,
+            preferred_language: onboardingData.language || null,
+            notes: onboardingData.notes || null,
+            created_at: new Date().toISOString()  // if your table has this column
+          }
+        ]);
 
       if (error) throw error;
 
-      setCurrentStep(6); // Move to confirmation step
+      // Show success and move to next step
+      alert('Offshore application submitted successfully!');
+      setCurrentStep(6);
     } catch (error) {
       console.error('Error submitting offshore application:', error);
+      alert('Failed to submit application. Please try again.');
     }
   };
+
 
   const handleSubmitMainland = async () => {
     try {

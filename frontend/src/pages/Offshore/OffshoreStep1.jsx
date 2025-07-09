@@ -39,7 +39,7 @@ const OffshoreStep1 = ({ formData, setFormData, onNext, onBack }) => (
             disabled={
               !formData.contactName || !formData.contactPhone || !formData.contactEmail
             }
-            onClick={onNext}
+            onClick={() => onNext()}
           >
             Continue
           </button>

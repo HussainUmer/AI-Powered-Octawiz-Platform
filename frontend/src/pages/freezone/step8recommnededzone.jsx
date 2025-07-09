@@ -58,16 +58,10 @@ export default function Step8ZoneRecommendation({ onNext, onPrev, onboardingId, 
     <div className="step8-zone-recommendation d-flex vh-100 bg-dark text-white">
       <div className="form-container">
         <div className="card-container">
-          <h2 className="title">Free Zone Recommendation</h2>
+          <h2 className="title">Choose a Free Zone</h2>
           <p className="subtitle">
-            Based on your business details, we recommend the following free zone for your company:
+            Please select the free zone where you want to register your company.
           </p>
-          <button
-            className="btn btn-sm btn-outline-light mb-3"
-            onClick={togglePopup}
-          >
-            Why is this recommended?
-          </button>
           <div className="options-container">
             <div className="freezone-list">
               {freezones.map((freezone) => (
@@ -81,9 +75,6 @@ export default function Step8ZoneRecommendation({ onNext, onPrev, onboardingId, 
                 >
                   <div className="option-name">
                     {freezone.name}
-                    {freezone.name === recommendedFreezone && (
-                      <span className="recommended-tag">Recommended</span>
-                    )}
                   </div>
                   {selected === freezone.id && (
                     <div className="freezone-details">

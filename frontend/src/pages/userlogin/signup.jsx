@@ -64,13 +64,13 @@ const SignupPage = () => {
         },
       ]).select('user_id').single();
       if (!error && data && data.user_id) {
-        // Immediately create a unique onboarding row for this user and check for errors
-        const { error: onboardingError } = await supabase.from('Onboarding').insert([{ user_id: data.user_id }]);
-        if (onboardingError) {
-          setSignupError('Onboarding row creation failed: ' + onboardingError.message);
-          setLoading(false);
-          return;
-        }
+        // REMOVE: Do not create onboarding row here
+        // const { error: onboardingError } = await supabase.from('Onboarding').insert([{ user_id: data.user_id }]);
+        // if (onboardingError) {
+        //   setSignupError('Onboarding row creation failed: ' + onboardingError.message);
+        //   setLoading(false);
+        //   return;
+        // }
       }
       setLoading(false);
       if (error) {

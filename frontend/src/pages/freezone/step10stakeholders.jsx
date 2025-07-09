@@ -24,9 +24,17 @@ export default function Step10Stakeholders({ onNext, onPrev, onboardingId, initi
     setStakeholders([...stakeholders, { name: '', nationality: '', passport: '', email: '' }]);
   };
 
-  const removeStakeholder = (idx) => {
+  const removeStakeholder = async (idx) => {
     if (stakeholders.length === 1) return;
+    const s = stakeholders[idx];
     setStakeholders(stakeholders.filter((_, i) => i !== idx));
+    // Remove from DB if exists
+    if (s.passport && onboardingId) {
+      await supabase.from('Shareholder')
+        .delete()
+        .eq('passport_no', s.passport)
+        .eq('onboarding_id', onboardingId);
+    }
   };
 
   const isValid = stakeholders.every(s => s.name && s.nationality && s.passport && s.email);
@@ -34,21 +42,98 @@ export default function Step10Stakeholders({ onNext, onPrev, onboardingId, initi
   const handleContinue = async () => {
     setLoading(true);
     setError('');
-    // Save all stakeholders to Shareholder table
-    const rows = stakeholders.map(s => ({
-      name: s.name,
-      nationality: s.nationality,
-      passport_no: s.passport,
-      email: s.email,
-      onboarding_id: onboardingId,
-    }));
-    console.log('Saving stakeholders:', rows);
-    const { error } = await supabase.from('Shareholder').insert(rows);
-    setLoading(false);
-    if (error) {
-      setError('Failed to save stakeholders. Please try again.');
+    // Fetch existing stakeholders for this onboarding
+    let { data: existingStakeholders, error: fetchError } = await supabase
+      .from('Shareholder')
+      .select('*')
+      .eq('onboarding_id', onboardingId);
+    if (fetchError) {
+      setLoading(false);
+      setError('Failed to check existing stakeholders. Please try again.');
       return;
     }
+    const toInsert = [];
+    const toUpdate = [];
+    // Special case: single stakeholder, passport changed
+    if (existingStakeholders.length === 1 && stakeholders.length === 1) {
+      const old = existingStakeholders[0];
+      const current = stakeholders[0];
+      if (old.passport_no !== current.passport) {
+        // Delete old
+        await supabase.from('Shareholder')
+          .delete()
+          .eq('passport_no', old.passport_no)
+          .eq('onboarding_id', onboardingId);
+        // Insert new
+        toInsert.push({
+          name: current.name,
+          nationality: current.nationality,
+          passport_no: current.passport,
+          email: current.email,
+          onboarding_id: onboardingId,
+        });
+      } else {
+        // Just update as usual
+        toUpdate.push({
+          passport_no: current.passport,
+          onboarding_id: onboardingId,
+          name: current.name,
+          nationality: current.nationality,
+          email: current.email
+        });
+      }
+    } else {
+      // Normal multi-stakeholder logic
+      for (const s of stakeholders) {
+        const match = existingStakeholders.find(e =>
+          e.passport_no === s.passport
+        );
+        if (!match) {
+          toInsert.push({
+            name: s.name,
+            nationality: s.nationality,
+            passport_no: s.passport,
+            email: s.email,
+            onboarding_id: onboardingId,
+          });
+        } else {
+          toUpdate.push({
+            passport_no: s.passport,
+            onboarding_id: onboardingId,
+            name: s.name,
+            nationality: s.nationality,
+            email: s.email
+          });
+        }
+      }
+    }
+    // Insert new stakeholders
+    if (toInsert.length > 0) {
+      const { error: insertError } = await supabase.from('Shareholder').insert(toInsert);
+      if (insertError) {
+        setLoading(false);
+        setError('Failed to save new stakeholders. Please try again.');
+        return;
+      }
+    }
+    // Update all matching passport rows
+    if (toUpdate.length > 0) {
+      const updatePromises = toUpdate.map(async upd => {
+        const result = await supabase.from('Shareholder')
+          .update({ name: upd.name, nationality: upd.nationality, email: upd.email })
+          .eq('passport_no', upd.passport_no)
+          .eq('onboarding_id', upd.onboarding_id);
+        return result;
+      });
+      const updateResults = await Promise.all(updatePromises);
+      const updateError = updateResults.find(r => r.error);
+      if (updateError) {
+        setLoading(false);
+        setError('Failed to update one or more stakeholders. ' + (updateError.error?.message || 'Please try again.'));
+        return;
+      }
+    }
+    setLoading(false);
     onNext({ stakeholders });
   };
 

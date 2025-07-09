@@ -118,12 +118,11 @@ export default function OnboardingContainer() {
   };
 
   useEffect(() => {
-    // Fetch or create onboarding row for the logged-in user
-    const fetchOrCreateOnboarding = async () => {
+    // Only restore if onboarding exists for user
+    const fetchOnboarding = async () => {
       const user = JSON.parse(localStorage.getItem('user'));
       const user_id = user?.user_id;
       if (!user_id) return;
-      // Try to fetch existing onboarding row
       let { data, error } = await supabase
         .from('Onboarding')
         .select('*')
@@ -131,13 +130,10 @@ export default function OnboardingContainer() {
         .single();
       if (data && data.id) {
         setOnboardingId(data.id);
-        // Always start from the first step, but prefill previous choices
         let onboardingData = {};
         if (data.industry) onboardingData.industryId = data.industry;
-        // --- ACTIVITY PREFILL LOGIC ---
         if (data.activity || data.custom_activity) {
           if (data.activity) {
-            // Fetch activity name from Activities table
             const { data: act } = await supabase
               .from('Activities')
               .select('name')
@@ -154,7 +150,6 @@ export default function OnboardingContainer() {
         if (data.visa_requirement) onboardingData.visa_requirement = data.visa_requirement;
         if (data.office_type) onboardingData.office_type = data.office_type;
         if (data.trade_name) onboardingData.trade_name = data.trade_name;
-        // --- FETCH STAKEHOLDERS ---
         const { data: stakeholders } = await supabase
           .from('Shareholder')
           .select('name, nationality, passport_no, email, share_capital, percentage')
@@ -169,7 +164,6 @@ export default function OnboardingContainer() {
           onboardingData.equity = stakeholders.map(s => s.percentage);
           onboardingData.shareCapital = stakeholders[0].share_capital;
         }
-        // --- FETCH DOCUMENTS ---
         const { data: documents } = await supabase
           .from('Documents')
           .select('*')
@@ -177,31 +171,86 @@ export default function OnboardingContainer() {
         if (documents && documents.length > 0) {
           onboardingData.documents = documents;
         }
-        // ...add more fields as needed for prefill (e.g. documents)...
-        setCurrentStep(1); // Always start from first screen
+        setCurrentStep(1);
+        setOnboardingData(onboardingData);
+      }
+    };
+    fetchOnboarding();
+  }, []);
+
+  // Only create onboarding row when user selects Freezone
+  const handleCategorySelect = async (cat) => {
+    setCategory(cat);
+    setCurrentStep(1);
+    setOnboardingData({ category: cat });
+    if (cat === 'freezone') {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const user_id = user?.user_id;
+      // Check if onboarding row already exists
+      const { data: existing, error: fetchError } = await supabase
+        .from('Onboarding')
+        .select('*')
+        .eq('user_id', user_id)
+        .single();
+      if (existing && existing.id) {
+        setOnboardingId(existing.id);
+        // Restore progress
+        let onboardingData = {};
+        if (existing.industry) onboardingData.industryId = existing.industry;
+        if (existing.activity || existing.custom_activity) {
+          if (existing.activity) {
+            const { data: act } = await supabase
+              .from('Activities')
+              .select('name')
+              .eq('id', existing.activity)
+              .single();
+            onboardingData.activities = act && act.name ? [act.name] : [];
+          } else {
+            onboardingData.activities = [];
+          }
+          onboardingData.customActivity = existing.custom_activity || '';
+        }
+        if (existing.ownership) onboardingData.ownership = existing.ownership;
+        if (existing.freezone) onboardingData.freezone = existing.freezone;
+        if (existing.visa_requirement) onboardingData.visa_requirement = existing.visa_requirement;
+        if (existing.office_type) onboardingData.office_type = existing.office_type;
+        if (existing.trade_name) onboardingData.trade_name = existing.trade_name;
+        const { data: stakeholders } = await supabase
+          .from('Shareholder')
+          .select('name, nationality, passport_no, email, share_capital, percentage')
+          .eq('onboarding_id', existing.id);
+        if (stakeholders && stakeholders.length > 0) {
+          onboardingData.stakeholders = stakeholders.map(s => ({
+            name: s.name,
+            nationality: s.nationality,
+            passport: s.passport_no,
+            email: s.email
+          }));
+          onboardingData.equity = stakeholders.map(s => s.percentage);
+          onboardingData.shareCapital = stakeholders[0].share_capital;
+        }
+        const { data: documents } = await supabase
+          .from('Documents')
+          .select('*')
+          .eq('onboarding_id', existing.id);
+        if (documents && documents.length > 0) {
+          onboardingData.documents = documents;
+        }
         setOnboardingData(onboardingData);
       } else {
-        // Create onboarding row if not found
+        // Only create if not exists
         const { data: newData, error: insertError } = await supabase
           .from('Onboarding')
           .insert([{ user_id }])
           .select('id')
           .single();
-        if (insertError) {
-          console.error('Error creating onboarding row:', insertError);
-          setOnboardingId(null);
-          return;
+        if (!insertError) {
+          setOnboardingId(newData?.id);
         }
-        setOnboardingId(newData?.id);
       }
-    };
-    fetchOrCreateOnboarding();
-  }, []);
-
-  const handleCategorySelect = (cat) => {
-    setCategory(cat);
-    setCurrentStep(1);
-    setOnboardingData({ category: cat });
+    } else {
+      setOnboardingId(null);
+    }
   };
 
   const nextStep = (data = {}) => {

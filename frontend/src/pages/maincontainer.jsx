@@ -91,36 +91,76 @@ export default function OnboardingContainer() {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
       const user_id = user?.user_id;
-      
-      if (!onboardingId) {
-        console.error('No onboarding ID found');
+      if (!user_id) {
+        console.error('No user found in localStorage');
         return;
       }
 
-      const { error } = await supabase
-        .from('Onboarding')
-        .update({
-          business_name: onboardingData.businessName,
-          legal_structure: onboardingData.legalStructure,
-          contact_name: onboardingData.contactName,
-          contact_phone: onboardingData.contactPhone,
-          contact_email: onboardingData.contactEmail,
-          employee_count: onboardingData.employeeCount,
-          business_proposal: onboardingData.businessProposal,
-          notes: onboardingData.notes,
-          status: 'submitted',
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', onboardingId);
+      // Build payload from your form data
+      const payload = {
+        user_id,
+        business_name:          onboardingData.businessName  || null,
+        legal_structure:        onboardingData.legalStructure|| null,
+        full_name:              onboardingData.contactName   || null,
+        phone_number:           onboardingData.contactPhone  || null,
+        email_address:          onboardingData.contactEmail  || null,
+        estimated_employees_range: onboardingData.employeeCount || null,
+        business_proposal:      onboardingData.businessProposal || null,
+        notes:                  onboardingData.notes        || null,
+        created_at:             new Date().toISOString()
+      };
+
+      console.log('Inserting Mainland payload:', payload);
+      const { data, error } = await supabase
+        .from('MainlandUserInfo')
+        .insert([payload]);
 
       if (error) throw error;
+      console.log('Mainland insert success:', data);
 
-      setCurrentStep(8); // Navigate to confirmation step
-    } catch (error) {
-      console.error('Error submitting mainland application:', error);
-      // Handle error (show toast, etc.)
+      // Advance to a new success step
+      setCurrentStep(7);
+
+    } catch (err) {
+      console.error('Error submitting mainland application:', err);
+      alert('Failed to submit mainland application.');
     }
   };
+
+  // const handleSubmitMainland = async () => {
+  //   try {
+  //     const user = JSON.parse(localStorage.getItem('user'));
+  //     const user_id = user?.user_id;
+      
+  //     if (!onboardingId) {
+  //       console.error('No onboarding ID found');
+  //       return;
+  //     }
+
+  //     const { error } = await supabase
+  //       .from('Onboarding')
+  //       .update({
+  //         business_name: onboardingData.businessName,
+  //         legal_structure: onboardingData.legalStructure,
+  //         contact_name: onboardingData.contactName,
+  //         contact_phone: onboardingData.contactPhone,
+  //         contact_email: onboardingData.contactEmail,
+  //         employee_count: onboardingData.employeeCount,
+  //         business_proposal: onboardingData.businessProposal,
+  //         notes: onboardingData.notes,
+  //         status: 'submitted',
+  //         updated_at: new Date().toISOString()
+  //       })
+  //       .eq('id', onboardingId);
+
+  //     if (error) throw error;
+
+  //     setCurrentStep(8); // Navigate to confirmation step
+  //   } catch (error) {
+  //     console.error('Error submitting mainland application:', error);
+  //     // Handle error (show toast, etc.)
+  //   }
+  // };
 
   useEffect(() => {
     // Only restore if onboarding exists for user
@@ -323,6 +363,23 @@ export default function OnboardingContainer() {
               onPrev={() => setCurrentStep(5)}  // Goes back to BusinessProposal now
             />
           );
+        case 7:
+          return (
+            <div className="d-flex flex-column justify-content-center align-items-center vh-100 bg-dark text-white">
+              <h2 className="mb-3">Application Has Been Submitted</h2>
+              <p className="lead mb-4">We will contact you shortly.</p>
+              <button
+                className="btn btn-outline-danger"
+                onClick={() => {
+                  localStorage.removeItem('user');
+                  navigate('/signin');
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          );
+
         default:
           return <div className="p-5 text-white">Mainland step not implemented yet.</div>;
       }
@@ -434,13 +491,22 @@ export default function OnboardingContainer() {
           );
         case 6:
           return (
-            <div className="p-5 text-white">
-              <h2>Application Submitted Successfully!</h2>
-              <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
-                Go to Dashboard
+            <div className="d-flex flex-column justify-content-center align-items-center vh-100 bg-dark text-white">
+              <h2 className="mb-3">Application Has Been Submitted</h2>
+              <p className="lead mb-4">We will contact you shortly.</p>
+              <button
+                className="btn btn-outline-danger"
+                onClick={() => {
+                  localStorage.removeItem('user');
+                  navigate('/signin');
+                }}
+              >
+                Logout
               </button>
             </div>
           );
+
+
         default:
           return <div className="p-5 text-white">Offshore step not implemented yet.</div>;
       }

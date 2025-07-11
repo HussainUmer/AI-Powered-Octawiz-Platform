@@ -22,10 +22,9 @@ export default function Step8ZoneRecommendation({ onNext, onPrev, onboardingId, 
         return;
       }
       setFreezones(data);
-      if (data && data.length > 0) {
-        setRecommendedFreezone(data[0].name);
-        if (!selected) setSelected(data[0].id);
-      }
+      setRecommendedFreezone(data && data.length > 0 ? data[0].name : '');
+      // Remove auto-selection of first freezone
+      // if (!selected) setSelected(data[0].id);
     };
     fetchFreezones();
   }, []);

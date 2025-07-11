@@ -6,6 +6,7 @@ export default function UserDetails() {
   const { onboardingId } = useParams();
   const [summary, setSummary] = useState(null);
   const [documents, setDocuments] = useState([]);
+  const [shareholders, setShareholders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -48,6 +49,12 @@ export default function UserDetails() {
         .select('*')
         .eq('onboarding_id', onboardingId);
       setDocuments(docs || []);
+      // Fetch shareholder equity
+      const { data: shareholders } = await supabase
+        .from('Shareholder')
+        .select('name, email, nationality, shares, percentage, share_capital')
+        .eq('onboarding_id', onboardingId);
+      setShareholders(shareholders || []);
       setLoading(false);
     };
     fetchDetails();
@@ -87,12 +94,45 @@ export default function UserDetails() {
         </div>
         <h2 className="mb-4 text-center title" style={{ color: 'var(--color-primary)' }}>User Journey Details</h2>
         <div className="mb-4" style={{ background: '#23272f', borderRadius: 12, padding: '1.25rem 1rem', color: '#fff', boxShadow: '0 2px 8px #0002' }}>
-          <div className="mb-2"><strong>Industry:</strong> <span>{summary.industryName}</span></div>
-          <div className="mb-2"><strong>Activity:</strong> <span>{summary.activityName}</span></div>
-          <div className="mb-2"><strong>Freezone:</strong> <span>{summary.freezoneName}</span></div>
-          <div className="mb-2"><strong>Visa Requirement:</strong> <span>{summary.visa_requirement}</span></div>
-          <div className="mb-2"><strong>Office Type:</strong> <span>{summary.office_type}</span></div>
-          <div className="mb-2"><strong>Trade Name:</strong> <span>{summary.trade_name}</span></div>
+          <div className="mb-2"><strong>Industry:</strong> <span>{summary.industryName || ''}</span></div>
+          <div className="mb-2"><strong>Activity:</strong> <span>{summary.activityName || ''}</span></div>
+          <div className="mb-2"><strong>Freezone:</strong> <span>{summary.freezoneName || ''}</span></div>
+          <div className="mb-2"><strong>Visa Requirement:</strong> <span>{summary.visa_requirement || ''}</span></div>
+          <div className="mb-2"><strong>Office Type:</strong> <span>{(summary.office_type || '').replace(/[_-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span></div>
+          <div className="mb-2"><strong>Trade Name:</strong> <span>{summary.trade_name || ''}</span></div>
+          <div className="mb-2"><strong>Total Share Capital:</strong> <span>{summary.total_share_capital || ''}</span></div>
+          <div className="mb-2"><strong>Value per Share:</strong> <span>{summary.value_per_share || ''}</span></div>
+          <div className="mb-2"><strong>Total Shares:</strong> <span>{summary.total_shares || ''}</span></div>
+        </div>
+        {/* Shareholder Equity Section */}
+        <div className="mb-4" style={{ background: '#23272f', borderRadius: 12, padding: '1.25rem 1rem', color: '#fff', boxShadow: '0 2px 8px #0002' }}>
+          <h5 className="mb-2">Shareholder Equity & Capital</h5>
+          <div className="table-responsive">
+            <table className="table table-dark table-hover align-middle" style={{ borderRadius: 12, overflow: 'hidden' }}>
+              <thead style={{ background: '#23272f' }}>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Nationality</th>
+                  <th>Shares</th>
+                  <th>Percentage</th>
+                  <th>Share Capital (AED)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {shareholders.map(s => (
+                  <tr key={s.name + s.email} style={{ background: '#23272f' }}>
+                    <td>{s.name}</td>
+                    <td>{s.email}</td>
+                    <td>{s.nationality}</td>
+                    <td>{s.shares}</td>
+                    <td>{s.percentage}%</td>
+                    <td>{s.share_capital}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         <div>
           <h5 className="mb-2">Uploaded Documents</h5>

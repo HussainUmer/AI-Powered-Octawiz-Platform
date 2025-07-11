@@ -197,17 +197,21 @@ export default function OnboardingContainer() {
         if (data.trade_name) onboardingData.trade_name = data.trade_name;
         const { data: stakeholders } = await supabase
           .from('Shareholder')
-          .select('name, nationality, passport_no, email, share_capital, percentage')
+          .select('shareholder_id, name, nationality, passport_no, email, share_capital, percentage, shares')
           .eq('onboarding_id', data.id);
         if (stakeholders && stakeholders.length > 0) {
           onboardingData.stakeholders = stakeholders.map(s => ({
             name: s.name,
             nationality: s.nationality,
             passport: s.passport_no,
-            email: s.email
+            email: s.email,
+            shareholder_id: s.shareholder_id,
+            shares: s.shares,
+            percentage: s.percentage,
+            share_capital: s.share_capital
           }));
           onboardingData.equity = stakeholders.map(s => s.percentage);
-          onboardingData.shareCapital = stakeholders[0].share_capital;
+          onboardingData.shareCapital = data.total_share_capital || 5000;
         }
         const { data: documents } = await supabase
           .from('Documents')
@@ -262,14 +266,18 @@ export default function OnboardingContainer() {
         if (existing.trade_name) onboardingData.trade_name = existing.trade_name;
         const { data: stakeholders } = await supabase
           .from('Shareholder')
-          .select('name, nationality, passport_no, email, share_capital, percentage')
+          .select('shareholder_id, name, nationality, passport_no, email, share_capital, percentage, shares')
           .eq('onboarding_id', existing.id);
         if (stakeholders && stakeholders.length > 0) {
           onboardingData.stakeholders = stakeholders.map(s => ({
             name: s.name,
             nationality: s.nationality,
             passport: s.passport_no,
-            email: s.email
+            email: s.email,
+            shareholder_id: s.shareholder_id,
+            shares: s.shares,
+            percentage: s.percentage,
+            share_capital: s.share_capital
           }));
           onboardingData.equity = stakeholders.map(s => s.percentage);
           onboardingData.shareCapital = stakeholders[0].share_capital;
@@ -423,7 +431,29 @@ export default function OnboardingContainer() {
         case 7:
           return <Step9TradeName onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} initialTradeName={onboardingData.trade_name} />;
         case 8:
-          return <Step10Stakeholders onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} initialStakeholders={onboardingData.stakeholders} />;
+          return <Step10Stakeholders
+            onNext={async () => {
+              // Refresh stakeholders from DB before equity screen
+              const { data: stakeholders } = await supabase
+                .from('Shareholder')
+                .select('shareholder_id, name, nationality, passport_no, email, share_capital, percentage, shares')
+                .eq('onboarding_id', onboardingId);
+              onboardingData.stakeholders = stakeholders?.map(s => ({
+                name: s.name,
+                nationality: s.nationality,
+                passport: s.passport_no,
+                email: s.email,
+                shareholder_id: s.shareholder_id,
+                shares: s.shares,
+                percentage: s.percentage,
+                share_capital: s.share_capital
+              })) || [];
+              nextStep();
+            }}
+            onPrev={prevStep}
+            onboardingId={onboardingId}
+            initialStakeholders={onboardingData.stakeholders}
+          />;
         case 9:
           return <Step11ShareCapital onNext={nextStep} onPrev={prevStep} stakeholders={onboardingData.stakeholders || []} onboardingId={onboardingId} initialEquity={onboardingData.equity} initialShareCapital={onboardingData.shareCapital} />;
         case 10:

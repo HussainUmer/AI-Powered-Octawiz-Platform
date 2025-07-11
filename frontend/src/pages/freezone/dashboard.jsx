@@ -30,12 +30,18 @@ export default function Dashboard() {
       const { data: userOnboardings, error: userError } = await supabase
         .from('Onboarding')
         .select(`
-          *,
-          Industry(name),
-          Activities(name),
-          Owner_structure(struture_name),
-          Freezones(name)
-        `)
+            id,
+            user_id,
+            trade_name,
+            office_type,
+            visa_requirement,
+            paid,
+            custom_activity,
+            Industry(name),
+            Activities(name),
+            Freezones(name),
+            Owner_structure(struture_name)
+          `)
         .eq('user_id', userId);
 
       if (userError) throw userError;
@@ -46,11 +52,17 @@ export default function Dashboard() {
         .select(`
           onboarding_id,
           Onboarding(
-            *,
+            id,
+            user_id,
+            trade_name,
+            office_type,
+            visa_requirement,
+            paid,
+            custom_activity,
             Industry(name),
             Activities(name),
-            Owner_structure(struture_name),
-            Freezones(name)
+            Freezones(name),
+            Owner_structure(struture_name)
           )
         `)
         .eq('shareholder_id', userId); // Assuming shareholder_id is stored in localStorage if the user is a shareholder
@@ -100,7 +112,7 @@ export default function Dashboard() {
   // Calculate progress based on completed fields in onboarding and documents
   useEffect(() => {
     let filledFields = 0;
-    let totalFields = onboardingRecords.length * 7; // 7 fields per onboarding record
+    let totalFields = onboardingRecords.length * 9; // 7 fields per onboarding record
     console.log('Calculating progress for onboarding records:', onboardingRecords.length);
 
     // Count fields in onboarding data
@@ -115,6 +127,7 @@ export default function Dashboard() {
 
     // Count uploaded documents
     documents.forEach((doc) => {
+      console.log('Processing document:', doc);
       if (doc.status === 'uploaded') {
         filledFields++;
       }

@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Step10Stakeholders({ onNext, onPrev, onboardingId, initialStakeholders }) {
+// Accept ownerStructureId as a prop
+export default function Step10Stakeholders({ onNext, onPrev, onboardingId, initialStakeholders, ownerStructureId }) {
+  const [ownerStructureName, setOwnerStructureName] = useState('');
+
+  useEffect(() => {
+    async function fetchOwnerStructureName() {
+      if (ownerStructureId) {
+        const { data, error } = await supabase
+          .from('Ownership_structure')
+          .select('struture_name')
+          .eq('id', ownerStructureId)
+          .single();
+        if (data && data.struture_name) setOwnerStructureName(data.struture_name);
+      }
+    }
+    fetchOwnerStructureName();
+  }, [ownerStructureId]);
+  // Accept ownerStructureId prop
   const [stakeholders, setStakeholders] = useState(initialStakeholders && initialStakeholders.length > 0 ? initialStakeholders : [
     { name: '', nationality: '', passport: '', email: '' }
   ]);
@@ -199,7 +216,7 @@ export default function Step10Stakeholders({ onNext, onPrev, onboardingId, initi
               </div>
             </div>
           ))}
-          <button className="btn btn-outline-light mb-3" onClick={addStakeholder}>
+          <button className="btn btn-outline-light mb-3" onClick={addStakeholder} disabled={ownerStructureId === 1}>
             + Add Stakeholder
           </button>
           <div className="button-group">

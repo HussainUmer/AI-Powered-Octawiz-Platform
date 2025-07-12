@@ -14,7 +14,7 @@ export default function AdminDashboard() {
       const { data: onboardings } = await supabase
         .from('Onboarding')
         .select('*')
-        .eq('paid', true);
+        .eq('submitted', true);
       // Fetch all related names in one go
       const [industries, activities, freezones, usersTable] = await Promise.all([
         supabase.from('Industry').select('id, name'),

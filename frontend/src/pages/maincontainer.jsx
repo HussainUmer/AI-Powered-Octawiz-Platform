@@ -32,7 +32,6 @@ import Step11ShareCapital from './freezone/step11sharecapital';
 import Step12UploadDocuments from './freezone/step12uploaddocuments';
 import Step13ReviewPayment from './freezone/step13reviewpayment';
 import Step14Confirmation from './freezone/step14confirmation';
-import Step14Payment from './freezone/step14payment';
 
 import NotAvailable from './notavailiable';
 import StepsSidebar from '../components/stepsidebar';
@@ -40,6 +39,12 @@ import StepsSidebar_freezone from '../components/stepsidebar_freezone';
 // import ChatBot from '../components/chatbot';
 
 export default function OnboardingContainer() {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const handler = () => setCurrentStep(13);
+    window.addEventListener('advanceStepAfterSubmit', handler);
+    return () => window.removeEventListener('advanceStepAfterSubmit', handler);
+  }, []);
   const [category, setCategory] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [onboardingData, setOnboardingData] = useState({});
@@ -195,6 +200,8 @@ export default function OnboardingContainer() {
         if (data.visa_requirement) onboardingData.visa_requirement = data.visa_requirement;
         if (data.office_type) onboardingData.office_type = data.office_type;
         if (data.trade_name) onboardingData.trade_name = data.trade_name;
+        if (data.trade_name2) onboardingData.trade_name2 = data.trade_name2;
+        if (data.trade_name3) onboardingData.trade_name3 = data.trade_name3;
         const { data: stakeholders } = await supabase
           .from('Shareholder')
           .select('shareholder_id, name, nationality, passport_no, email, share_capital, percentage, shares')
@@ -220,9 +227,14 @@ export default function OnboardingContainer() {
         if (documents && documents.length > 0) {
           onboardingData.documents = documents;
         }
-        setCurrentStep(1);
+        if (data.submitted) {
+          navigate('/dashboard'); // Directly redirect to dashboard
+        } else {
+          setCurrentStep(1);
+        }
         setOnboardingData(onboardingData);
       }
+      setLoading(false);
     };
     fetchOnboarding();
   }, []);
@@ -264,6 +276,8 @@ export default function OnboardingContainer() {
         if (existing.visa_requirement) onboardingData.visa_requirement = existing.visa_requirement;
         if (existing.office_type) onboardingData.office_type = existing.office_type;
         if (existing.trade_name) onboardingData.trade_name = existing.trade_name;
+        if (existing.trade_name2) onboardingData.trade_name2 = existing.trade_name2;
+        if (existing.trade_name3) onboardingData.trade_name3 = existing.trade_name3;
         const { data: stakeholders } = await supabase
           .from('Shareholder')
           .select('shareholder_id, name, nationality, passport_no, email, share_capital, percentage, shares')
@@ -325,6 +339,9 @@ export default function OnboardingContainer() {
   };
 
   const renderStep = () => {
+    if (loading) {
+      return <div className="d-flex justify-content-center align-items-center vh-100 bg-dark text-white"><span>Loading...</span></div>;
+    }
     if (!category) {
       return <CategorySelection onSelect={handleCategorySelect} />;
     }
@@ -429,7 +446,14 @@ export default function OnboardingContainer() {
         case 6:
           return <Step6OfficePreference onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} selectedOfficeType={onboardingData.office_type} />;
         case 7:
-          return <Step9TradeName onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} initialTradeName={onboardingData.trade_name} />;
+          return <Step9TradeName 
+            onNext={nextStep} 
+            onPrev={prevStep} 
+            onboardingId={onboardingId} 
+            initialTradeName={onboardingData.trade_name} 
+            initialTradeName2={onboardingData.trade_name2} 
+            initialTradeName3={onboardingData.trade_name3} 
+          />;
         case 8:
           return <Step10Stakeholders
             onNext={async () => {
@@ -453,15 +477,16 @@ export default function OnboardingContainer() {
             onPrev={prevStep}
             onboardingId={onboardingId}
             initialStakeholders={onboardingData.stakeholders}
+            ownerStructureId={onboardingData.ownership}
           />;
         case 9:
           return <Step11ShareCapital onNext={nextStep} onPrev={prevStep} stakeholders={onboardingData.stakeholders || []} onboardingId={onboardingId} initialEquity={onboardingData.equity} initialShareCapital={onboardingData.shareCapital} />;
         case 10:
-          return <Step12UploadDocuments onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} previousDocuments={onboardingData.documents || []} />;
+          return <Step12UploadDocuments onNext={nextStep} onPrev={prevStep} onboardingId={onboardingId} previousDocuments={onboardingData.documents || []} ownerStructureId={onboardingData.ownership} />;
         case 11:
-          return <Step13ReviewPayment onboardingData={onboardingData} onPrev={prevStep} onPayment={() => setCurrentStep(12)} onboardingId={onboardingId} />;
+          return <Step13ReviewPayment onboardingData={onboardingData} onPrev={prevStep} onboardingId={onboardingId} />;
         case 12:
-          return <Step14Payment onboardingData={onboardingData} onPrev={() => setCurrentStep(11)} onPayment={() => setCurrentStep(13)} onboardingId={onboardingId} />;
+          // Payment screen omitted, skip to confirmation
         case 13:
           return <Step14Confirmation onDashboard={() => setCurrentStep(14)} onboardingId={onboardingId} />;
         case 14:

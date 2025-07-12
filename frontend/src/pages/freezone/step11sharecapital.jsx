@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
 export default function Step11ShareCapital({ onNext, onPrev, stakeholders = [], onboardingId, initialEquity, initialShareCapital }) {
+  const MAX_SHARE_CAPITAL = 100000;
   // Use onboarding table columns for share capital, value per share, and total shares
   // Only use 5000 and 10 as defaults if DB values are null
   const [shareCapital, setShareCapital] = useState(initialShareCapital != null ? initialShareCapital : 5000);
@@ -49,10 +50,14 @@ export default function Step11ShareCapital({ onNext, onPrev, stakeholders = [], 
   const percentageError = totalPercentage > 100;
   const sharesError = totalSharesSum > totalShares;
   const capitalError = totalCapitalSum > shareCapital;
-  const showWarning = percentageError || sharesError || capitalError;
+  const shareCapitalError = shareCapital > MAX_SHARE_CAPITAL;
+  const showWarning = percentageError || sharesError || capitalError || shareCapitalError;
 
   const handleContinue = async () => {
-    if (!isValid || !onboardingId) return;
+    if (!isValid || !onboardingId || shareCapital > MAX_SHARE_CAPITAL) {
+      setError('Share Capital cannot exceed 100,000 AED.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -112,10 +117,21 @@ export default function Step11ShareCapital({ onNext, onPrev, stakeholders = [], 
               type="number"
               className="form-control form-control-sm"
               min={5000}
+              max={MAX_SHARE_CAPITAL}
               value={shareCapital}
-              onChange={e => setShareCapital(Number(e.target.value))}
+              onChange={e => {
+                let val = Number(e.target.value);
+                if (val > MAX_SHARE_CAPITAL) val = MAX_SHARE_CAPITAL;
+                setShareCapital(val);
+              }}
               style={{ fontSize: '0.9rem', padding: '4px 8px', maxWidth: 200 }}
             />
+            {shareCapital > MAX_SHARE_CAPITAL && (
+              <div className="text-danger mt-1">Share Capital cannot exceed 100,000 AED.</div>
+            )}
+            {shareCapital === MAX_SHARE_CAPITAL && (
+              <div className="text-warning mt-1">You have reached the maximum allowed share capital (100,000 AED).</div>
+            )}
           </div>
           <div className="mb-3">
             <label className="form-label text-white" style={{ fontSize: '0.9rem' }}>Value per Share (AED, min 10)</label>

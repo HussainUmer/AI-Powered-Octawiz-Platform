@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function Step13ReviewPayment({ onboardingId, onPrev, onPayment }) {
+export default function Step13ReviewPayment({ onboardingId, onPrev }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [summary, setSummary] = useState({});
@@ -72,9 +72,6 @@ export default function Step13ReviewPayment({ onboardingId, onPrev, onPayment })
     if (onboardingId) fetchSummary();
   }, [onboardingId]);
 
-  // Example price calculation (replace with real logic as needed)
-  const totalPrice = 5000 + (summary.visaRequirement === '6+' ? 2000 : 1000);
-
   return (
     <div className="step13-review-payment d-flex vh-100 bg-dark text-white">
       <div className="form-container">
@@ -95,12 +92,31 @@ export default function Step13ReviewPayment({ onboardingId, onPrev, onPayment })
               <div className="mb-2"><strong>Visa Requirement:</strong> <span>{summary.visaRequirement}</span></div>
               <div className="mb-2"><strong>Office Type:</strong> <span>{summary.officeType}</span></div>
               <div className="mb-2"><strong>Trade Name:</strong> <span>{summary.tradeName}</span></div>
-              <div className="mb-2"><strong>Total Price:</strong> <span style={{ color: '#0f0' }}>AED {totalPrice}</span></div>
             </div>
           )}
           <div className="button-group">
             <button className="btn btn-secondary" onClick={onPrev} disabled={loading}>Change</button>
-            <button className="btn btn-success" onClick={onPayment} disabled={loading || !!error}>Proceed to Payment</button>
+            <button
+              className="btn btn-success"
+              disabled={loading || !!error}
+              onClick={async () => {
+                setLoading(true);
+                setError("");
+                const { error: updateError } = await supabase
+                  .from("Onboarding")
+                  .update({ submitted: true })
+                  .eq("id", onboardingId);
+                setLoading(false);
+                if (updateError) {
+                  setError("Submission succeeded but failed to update status. Please contact support.");
+                  return;
+                }
+                // Advance to confirmation step after successful submission
+                window.dispatchEvent(new CustomEvent('advanceStepAfterSubmit'));
+              }}
+            >
+              Submit
+            </button>
           </div>
         </div>
       </div>

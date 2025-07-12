@@ -125,7 +125,8 @@ export default function Step4ActivitySelection({ onNext, onPrev, selectedIndustr
           </div>
 
           <div className="mb-3 mt-3">
-            <label htmlFor="customActivity" className="form-label" style={{ color: 'white' }}>Or enter a custom activity</label>
+            <label htmlFor="customActivity" className="form-label" style={{ color: 'white' }}>Enter a custom activity</label>
+          <label className="form-label" style={{ color: 'white' }}> You can also add multiple activities here separated with a comma.</label>
             <input
               type="text"
               id="customActivity"

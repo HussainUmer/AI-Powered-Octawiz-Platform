@@ -35,8 +35,11 @@ export default function Dashboard() {
             trade_name,
             office_type,
             visa_requirement,
-            paid,
+            submitted,
             custom_activity,
+            visa_approved,
+            license_approved,
+            tradename_approved,
             Industry(name),
             Activities(name),
             Freezones(name),
@@ -57,7 +60,7 @@ export default function Dashboard() {
             trade_name,
             office_type,
             visa_requirement,
-            paid,
+            submitted,
             custom_activity,
             Industry(name),
             Activities(name),
@@ -111,31 +114,38 @@ export default function Dashboard() {
 
   // Calculate progress based on completed fields in onboarding and documents
   useEffect(() => {
+    // Define required fields for onboarding progress
+    const requiredFields = [
+      'trade_name',
+      'office_type',
+      'visa_requirement',
+      'submitted',
+      'custom_activity',
+      'visa_approved',
+      'license_approved',
+      'tradename_approved'
+    ];
     let filledFields = 0;
-    let totalFields = onboardingRecords.length * 9; // 7 fields per onboarding record
-    console.log('Calculating progress for onboarding records:', onboardingRecords.length);
-
-    // Count fields in onboarding data
+    let totalFields = onboardingRecords.length * requiredFields.length;
+    // Count only required fields
     onboardingRecords.forEach((record) => {
-      console.log('Processing record:', record);
-      for (let key in record) {
-        if (key !== 'id' && record[key] !== null && record[key] !== '') {
+      requiredFields.forEach((field) => {
+        if (record[field] !== null && record[field] !== undefined && record[field] !== '') {
           filledFields++;
         }
-      }
+      });
     });
-
-    // Count uploaded documents
+    // Optionally count uploaded documents as part of progress
+    let docFields = 0;
     documents.forEach((doc) => {
-      console.log('Processing document:', doc);
       if (doc.status === 'uploaded') {
-        filledFields++;
+        docFields++;
       }
     });
-
-    // Calculate and set progress percentage
+    // Add document fields to total if you want them to count
     const total = totalFields + documents.length;
-    setProgress(total > 0 ? Math.round((filledFields / total) * 100) : 0);
+    const percent = total > 0 ? Math.round(((filledFields + docFields) / total) * 100) : 0;
+    setProgress(percent > 100 ? 100 : percent);
   }, [onboardingRecords, documents]);
 
   const handleLogout = () => {
@@ -245,12 +255,12 @@ export default function Dashboard() {
                 </div>
                 <div className="info-item">
                   <span>Activity:</span>{' '}
-                  <strong>{onboardingData.Activities?.name || 'Not Provided'}</strong>
+                  <strong>{onboardingData.Activities?.name || onboardingData.custom_activity || 'Not Provided'}</strong>
                   <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
                 </div>
                 <div className="info-item">
                   <span>Visa Requirement:</span>{' '}
-                  <strong>{onboardingData.visa_requirment || 'Not Provided'}</strong>
+                  <strong>{onboardingData.visa_requirement || 'Not Provided'}</strong>
                   <button className="btn btn-sm btn-outline-info ms-2">Edit</button>
                 </div>
                 <div className="info-item">

@@ -62,8 +62,6 @@ export default function AdminDashboard() {
                   <th>Industry</th>
                   <th>Activity</th>
                   <th>Freezone</th>
-                  <th>Ownership</th>
-                  <th>Trade Name</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -74,8 +72,6 @@ export default function AdminDashboard() {
                     <td>{u.industry_name}</td>
                     <td>{u.activity_name}</td>
                     <td>{u.freezone_name}</td>
-                    <td>{u.ownership || '-'}</td>
-                    <td>{u.trade_name || '-'}</td>
                     <td>
                       <button className="btn btn-primary btn-sm fw-semibold" onClick={() => navigate(`/admin/user/${u.id}`)}>
                         View Details

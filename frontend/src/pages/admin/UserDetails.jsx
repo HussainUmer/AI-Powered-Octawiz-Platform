@@ -100,6 +100,8 @@ export default function UserDetails() {
           <div className="mb-2"><strong>Visa Requirement:</strong> <span>{summary.visa_requirement || ''}</span></div>
           <div className="mb-2"><strong>Office Type:</strong> <span>{(summary.office_type || '').replace(/[_-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span></div>
           <div className="mb-2"><strong>Trade Name:</strong> <span>{summary.trade_name || ''}</span></div>
+          <div className="mb-2"><strong>Trade Name 2:</strong> <span>{summary.trade_name2 || ''}</span></div>
+          <div className="mb-2"><strong>Trade Name 3:</strong> <span>{summary.trade_name3 || ''}</span></div>
           <div className="mb-2"><strong>Total Share Capital:</strong> <span>{summary.total_share_capital || ''}</span></div>
           <div className="mb-2"><strong>Value per Share:</strong> <span>{summary.value_per_share || ''}</span></div>
           <div className="mb-2"><strong>Total Shares:</strong> <span>{summary.total_shares || ''}</span></div>

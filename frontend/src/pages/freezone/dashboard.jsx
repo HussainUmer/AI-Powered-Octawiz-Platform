@@ -113,7 +113,10 @@ export default function Dashboard() {
   };
 
   // Calculate progress based on completed fields in onboarding and documents
+  // Progress tracker is set to 100% for now. Dynamic calculation is commented out below.
   useEffect(() => {
+    setProgress(100);
+    /*
     // Define required fields for onboarding progress
     const requiredFields = [
       'trade_name',
@@ -146,6 +149,7 @@ export default function Dashboard() {
     const total = totalFields + documents.length;
     const percent = total > 0 ? Math.round(((filledFields + docFields) / total) * 100) : 0;
     setProgress(percent > 100 ? 100 : percent);
+    */
   }, [onboardingRecords, documents]);
 
   const handleLogout = () => {
